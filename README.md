@@ -64,7 +64,7 @@ Las maquetas y capturas de interfaz se encuentran organizadas en la carpeta `doc
 **Nikki Alvarado - nikalvarado-debug
 **Alvaro Oyarzún - Alvarooyar, majelss
 **Benjamin Almonacid - benjamin-almonacid
-**Kevin Mansilla
+**Kevin Mansilla-Sneiker02
 
 > **Asignatura:** Desarrollo de Aplicaciones Móviles  
 > **Institución:** Duoc UC Sede Puerto Montt  
