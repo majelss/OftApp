@@ -14,7 +14,7 @@ Actualmente, los resultados de los exámenes se generan en múltiples formatos (
 ### Logotipo
 El isotipo integra la forma de un ojo estilizado con una cruz médica en su comisura exterior, representando la especialización clínica y el uso de tecnología médica.
 
-![Logotipo de OftApp](docs/diseno/logo.png)
+<img src="docs/diseno/logo.png" alt="Logo OftApp" width="100%"/>
 
 ### Paleta de Colores
 
@@ -32,7 +32,7 @@ El isotipo integra la forma de un ojo estilizado con una cruz médica en su comi
 
 El siguiente diagrama ilustra el flujo de actividades según los roles de la aplicación (Tecnólogo, Administrativo, Médico y Paciente):
 
-![Diagrama de Actividad UML](docs/diseno/diagrama_actividad.png)
+<img src="docs/diseno/diagrama_actividad.png" alt="Diagrama de Actividad UML" width="100%"/>
 
 ---
 
@@ -61,10 +61,10 @@ Las maquetas y capturas de interfaz se encuentran organizadas en la carpeta `doc
 ---
 
 ## Integrantes
-**Nikki Alvarado - nikalvarado-debug
-**Alvaro Oyarzún - Alvarooyar, majelss
-**Benjamin Almonacid - benjamin-almonacid
-**Kevin Mansilla-Sneiker02
+* **Nikki Alvarado** - nikalvarado-debug
+* **Alvaro Oyarzún** - Alvarooyar, majelss
+* **Benjamin Almonacid** - benjamin-almonacid
+* **Kevin Mansilla**-Sneiker02
 
 > **Asignatura:** Desarrollo de Aplicaciones Móviles  
 > **Institución:** Duoc UC Sede Puerto Montt  
