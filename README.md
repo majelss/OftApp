@@ -32,7 +32,7 @@ El isotipo integra la forma de un ojo estilizado con una cruz médica en su comi
 
 El siguiente diagrama ilustra el flujo de actividades según los roles de la aplicación (Tecnólogo, Administrativo, Médico y Paciente):
 
-<img src="docs/diseno/diagrama_actividad.png" alt="Diagrama de Actividad UML" width="100%"/>
+<img src="docs/diseno/flujo-usuario-uml.png" alt="Diagrama de Actividad UML" width="100%"/>
 
 ---
 
