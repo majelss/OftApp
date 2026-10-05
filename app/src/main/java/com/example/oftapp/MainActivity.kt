@@ -3,25 +3,37 @@ package com.example.oftapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.oftapp.ui.screens.auth.LoginScreen
 import com.example.oftapp.ui.screens.dashboard.MainMenuScreen
-import com.example.oftapp.ui.theme.OftappTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
-            OftappTheme {
-                MainMenuScreen()
+            val navController = rememberNavController()
+
+            NavHost(
+                navController = navController,
+                startDestination = "login"
+            ) {
+                // Ruta 1: Login
+                composable("login") {
+                    LoginScreen(
+                        onLoginSuccess = {
+                            navController.navigate("main_menu") {
+                                popUpTo("login") { inclusive = true } // No regresa al login al presionar 'Atrás'
+                            }
+                        }
+                    )
+                }
+
+                // Ruta 2: Menú Principal
+                composable("main_menu") {
+                    MainMenuScreen()
+                }
             }
         }
     }

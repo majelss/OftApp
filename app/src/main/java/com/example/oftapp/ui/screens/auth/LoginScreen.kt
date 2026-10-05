@@ -32,7 +32,9 @@ val SecondaryButtonBg = Color(0xFFC7E7FF)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen() {
+fun LoginScreen(
+    onLoginSuccess: () -> Unit = {} // Parámetro para conectar la navegación
+) {
     var email by remember { mutableStateOf("dr.valenzuela@clinicaofta.cl") }
     var password by remember { mutableStateOf("1234567890") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -141,7 +143,11 @@ fun LoginScreen() {
                         onValueChange = { email = it },
                         modifier = Modifier.fillMaxWidth(),
                         leadingIcon = {
-                            Icon(Icons.Default.AccountCircle, contentDescription = null, tint = PrimaryBlue)
+                            Icon(
+                                Icons.Default.AccountCircle,
+                                contentDescription = null,
+                                tint = PrimaryBlue
+                            )
                         },
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -216,10 +222,18 @@ fun LoginScreen() {
                                 modifier = Modifier.padding(12.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(Icons.Default.MedicalServices, contentDescription = null, tint = PrimaryBlue)
+                                Icon(
+                                    Icons.Default.MedicalServices,
+                                    contentDescription = null,
+                                    tint = PrimaryBlue
+                                )
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Text(selectedRol.first, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                    Text(
+                                        selectedRol.first,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 14.sp
+                                    )
                                     Text(selectedRol.second, fontSize = 11.sp, color = Color.Gray)
                                 }
                                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedRol)
@@ -246,93 +260,8 @@ fun LoginScreen() {
                             }
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // Enlace ¿Olvidó su contraseña?
-                    Text(
-                        text = "¿Olvidó su contraseña?",
-                        fontSize = 13.sp,
-                        color = PrimaryBlue,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.End,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // Botón Iniciar Sesión
-                    Button(
-                        onClick = { /* TODO: Lógica de Login */ },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        shape = RoundedCornerShape(25.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("Iniciar Sesión", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Icon(Icons.Default.ArrowForward, contentDescription = null)
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    // Botón Ingreso con Biometría
-                    Button(
-                        onClick = { /* TODO: Lógica de Biometría */ },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        shape = RoundedCornerShape(25.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = SecondaryButtonBg,
-                            contentColor = PrimaryBlue
-                        )
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Fingerprint, contentDescription = null)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Ingreso con Biometría", fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                        }
-                    }
                 }
             }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Pie de página (Legales y Seguridad)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.Lock,
-                    contentDescription = null,
-                    tint = Color.Gray,
-                    modifier = Modifier.size(14.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "Conexión Segura SSL  •  Ley 20.584 Ficha Clínica",
-                    fontSize = 11.sp,
-                    color = Color.Gray
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = "Cumplimiento de estándares de confidencialidad y resguardo de datos médicos oftalmológicos.",
-                fontSize = 10.sp,
-                color = Color.Gray,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 20.dp)
-            )
         }
     }
-}
-
-@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
-@Composable
-fun LoginPreview() {
-    LoginScreen()
 }
