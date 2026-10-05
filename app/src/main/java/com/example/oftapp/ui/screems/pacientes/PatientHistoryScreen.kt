@@ -10,12 +10,15 @@ import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.oftapp.ui.screems.pacientes.components.PatientSummaryCard
 import com.example.oftapp.ui.screems.pacientes.components.TimelineEndMarker
 import com.example.oftapp.ui.screems.pacientes.components.TimelineFilterBar
@@ -26,9 +29,27 @@ import com.example.oftapp.ui.theme.OftAppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PatientHistoryScreen(
+    viewModel: PatientHistoryViewModel = viewModel(),
+    onBack: () -> Unit = {},
+    onExamenClick: (Long) -> Unit = {},
+    onVerDocumento: (Long) -> Unit = {}
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    PatientHistoryContent(
+        uiState = uiState,
+        onBack = onBack,
+        onFiltroChange = { viewModel.onFiltroChange(it) },
+        onExamenClick = onExamenClick,
+        onVerDocumento = onVerDocumento
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PatientHistoryContent(
     uiState: PatientHistoryUiState,
     onBack: () -> Unit = {},
-    onBuscarChange: (String) -> Unit = {},
     onFiltroChange: (FiltroTimeline) -> Unit = {},
     onExamenClick: (Long) -> Unit = {},
     onVerDocumento: (Long) -> Unit = {}
@@ -48,7 +69,7 @@ fun PatientHistoryScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { onBuscarChange("") }) {
+                    IconButton(onClick = { }) {
                         Icon(Icons.Default.Search, contentDescription = "Buscar")
                     }
                     IconButton(onClick = { }) {
@@ -122,6 +143,6 @@ fun PatientHistoryScreenPreview() {
             EventoTimeline(1, "15 Sep 2026 • 09:30", "Hace 2 días", "Campimetría Computarizada", "Ojo Derecho (OD) • Glaucoma", "Dr. Mauricio Rojas", "Oftalmología", "Validado", TipoEvento.EXAMEN, true),
             EventoTimeline(2, "08 Sep 2026 • 14:15", "Hace 9 días", "Topografía Corneal", "Ambos Ojos (AO) • Astigmatismo", "Tec. Carmen Silva", "Tecnología Oftálmica", "Validado", TipoEvento.EXAMEN, true)
         )
-        PatientHistoryScreen(uiState = PatientHistoryUiState(isLoading = false, paciente = p, timeline = t, timelineFiltrado = t))
+        PatientHistoryContent(uiState = PatientHistoryUiState(isLoading = false, paciente = p, timeline = t, timelineFiltrado = t))
     }
 }
