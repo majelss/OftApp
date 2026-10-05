@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.oftapp.ui.screens.auth.LoginScreen
+import com.example.oftapp.ui.screens.dashboard.MainMenuScreen
 import com.example.oftapp.ui.theme.OftappTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,9 +21,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             OftappTheme {
-                LoginScreen()
+                MainMenuScreen()
             }
         }
     }
 }
+
+
 
