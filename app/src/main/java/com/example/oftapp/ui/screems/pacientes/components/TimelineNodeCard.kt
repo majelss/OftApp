@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,8 +32,15 @@ fun TimelineNodeCard(
     mostrarLinea: Boolean = true,
     modifier: Modifier = Modifier
 ) {
-    Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(24.dp)) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Línea lateral y marcador
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.width(24.dp)
+        ) {
             Box(
                 modifier = Modifier
                     .size(20.dp)
@@ -50,34 +57,84 @@ fun TimelineNodeCard(
                 )
             }
         }
-        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
+        // Contenido de la tarjeta
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(fecha, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
-                Text(etiquetaRelativa, style = MaterialTheme.typography.labelMedium, color = ClinicalOnSurfaceVariant)
+                Text(
+                    text = fecha,
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = etiquetaRelativa,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = ClinicalOnSurfaceVariant
+                )
             }
+
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
-                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(titulo, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-                        Text(subtitulo, style = MaterialTheme.typography.bodyMedium, color = ClinicalOnSurfaceVariant)
-                        Text(" • ", style = MaterialTheme.typography.bodySmall, color = ClinicalOnSurfaceVariant)
+                        Text(
+                            text = titulo,
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            text = subtitulo,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = ClinicalOnSurfaceVariant
+                        )
+                        Text(
+                            text = "$profesional • $especialidad",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = ClinicalOnSurfaceVariant
+                        )
                     }
+
                     if (estadoLabel != null) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Text("Estado:", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium)
-                            Text(estadoLabel, style = MaterialTheme.typography.bodySmall, color = ClinicalPrimary, fontWeight = FontWeight.Medium)
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Estado:",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                text = estadoLabel,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = ClinicalPrimary,
+                                fontWeight = FontWeight.Medium
+                            )
                         }
                     }
+
                     if (tieneBotonAccion) {
-                        OutlinedButton(onClick = onBotonAccionClick, modifier = Modifier.fillMaxWidth()) {
-                            Text(textoBotonAccion)
+                        OutlinedButton(
+                            onClick = onBotonAccionClick,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(text = textoBotonAccion)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Icon(Icons.Default.ArrowForward, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                contentDescription = textoBotonAccion,
+                                modifier = Modifier.size(16.dp)
+                            )
                         }
                     }
                 }

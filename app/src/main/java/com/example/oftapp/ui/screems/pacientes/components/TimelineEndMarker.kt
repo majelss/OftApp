@@ -15,7 +15,10 @@ import androidx.compose.ui.unit.dp
 import com.example.oftapp.ui.theme.ClinicalOnSurfaceVariant
 
 @Composable
-fun TimelineEndMarker(modifier: Modifier = Modifier) {
+fun TimelineEndMarker(
+    texto: String,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -28,7 +31,7 @@ fun TimelineEndMarker(modifier: Modifier = Modifier) {
                 .background(Color(0xFFCBD5E1))
         )
         Text(
-            text = "Inicio del expediente clínico digital (2023)",
+            text = texto,
             style = MaterialTheme.typography.labelMedium,
             color = ClinicalOnSurfaceVariant,
             textAlign = TextAlign.Center

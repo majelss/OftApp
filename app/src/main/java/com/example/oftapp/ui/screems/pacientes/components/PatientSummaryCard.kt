@@ -7,8 +7,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Verified
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,8 +27,15 @@ fun PatientSummaryCard(
     activo: Boolean,
     atenciones: Int,
     validados: Int,
+    etiquetas: List<String> = emptyList(),
     modifier: Modifier = Modifier
 ) {
+    // Calcular iniciales desde las dos primeras palabras del nombre
+    val iniciales = nombre.split(" ")
+        .filter { it.isNotBlank() }
+        .take(2)
+        .joinToString("") { it.first().uppercase() }
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
@@ -38,40 +43,100 @@ fun PatientSummaryCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.size(48.dp).clip(CircleShape).background(ClinicalPrimary.copy(alpha = 0.12f)), contentAlignment = Alignment.Center) {
-                        Text("JP", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = ClinicalPrimary)
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(CircleShape)
+                            .background(ClinicalPrimary.copy(alpha = 0.12f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = iniciales,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = ClinicalPrimary
+                        )
                     }
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                             Text(nombre, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                            ClinicalTag(text = fonasa, backgroundColor = ClinicalPrimary.copy(alpha = 0.08f), contentColor = ClinicalPrimary)
+                            ClinicalTag(
+                                text = fonasa,
+                                backgroundColor = ClinicalPrimary.copy(alpha = 0.08f),
+                                contentColor = ClinicalPrimary
+                            )
                             if (activo) {
-                                ClinicalTag(text = "● Activo", backgroundColor = ClinicalSuccess.copy(alpha = 0.1f), contentColor = ClinicalSuccess)
+                                ClinicalTag(
+                                    text = "● Activo",
+                                    backgroundColor = ClinicalSuccess.copy(alpha = 0.1f),
+                                    contentColor = ClinicalSuccess
+                                )
                             }
                         }
-                        Text(" •  años", style = MaterialTheme.typography.bodyMedium, color = ClinicalOnSurfaceVariant)
+                        Text(
+                            text = "$rut  •  $edad años",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = ClinicalOnSurfaceVariant
+                        )
                     }
                 }
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                ClinicalTag(text = "Glaucoma Sospecha AO", backgroundColor = ClinicalError.copy(alpha = 0.1f), contentColor = ClinicalError)
-                Icon(Icons.Filled.Warning, null, tint = ClinicalError, modifier = Modifier.size(16.dp))
-                ClinicalTag(text = "Miopía Magna OD", backgroundColor = ClinicalSecondary.copy(alpha = 0.1f), contentColor = ClinicalSecondary)
-                Icon(Icons.Outlined.Visibility, null, tint = ClinicalSecondary, modifier = Modifier.size(16.dp))
-                ClinicalTag(text = "PIO: 16 mmHg", backgroundColor = Color(0xFF0F766E).copy(alpha = 0.1f), contentColor = Color(0xFF0F766E))
-                Icon(Icons.Filled.CheckCircle, null, tint = Color(0xFF0F766E), modifier = Modifier.size(16.dp))
+
+            // Etiquetas opcionales pasadas por parámetro (sin datos clínicos fijos)
+            if (etiquetas.isNotEmpty()) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    etiquetas.forEach { etiqueta ->
+                        ClinicalTag(
+                            text = etiqueta,
+                            backgroundColor = ClinicalPrimary.copy(alpha = 0.08f),
+                            contentColor = ClinicalOnSurface
+                        )
+                    }
+                }
             }
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.CheckCircle, null, tint = ClinicalPrimary, modifier = Modifier.size(18.dp))
-                    Text(" atenciones", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+                    Icon(
+                        Icons.Filled.CheckCircle,
+                        contentDescription = "Atenciones",
+                        tint = ClinicalPrimary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Text(
+                        text = "$atenciones atenciones",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
                 Box(modifier = Modifier.height(20.dp).width(1.dp).background(Color(0xFFE2E8F0)))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.Verified, null, tint = ClinicalSuccess, modifier = Modifier.size(18.dp))
-                    Text(" validados", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = ClinicalSuccess)
+                    Icon(
+                        Icons.Filled.Verified,
+                        contentDescription = "Validados",
+                        tint = ClinicalSuccess,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Text(
+                        text = "$validados validados",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = ClinicalSuccess
+                    )
                 }
             }
         }
