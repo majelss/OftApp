@@ -1,4 +1,4 @@
-﻿package com.example.oftapp.ui.screems.pacientes
+package com.example.oftapp.ui.screems.pacientes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

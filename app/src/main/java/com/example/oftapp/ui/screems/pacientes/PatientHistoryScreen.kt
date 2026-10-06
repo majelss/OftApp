@@ -1,4 +1,4 @@
-﻿package com.example.oftapp.ui.screems.pacientes
+package com.example.oftapp.ui.screems.pacientes
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -81,6 +81,7 @@ private fun PatientHistoryContent(
         },
         containerColor = ClinicalBackground
     ) { paddingValues ->
+        
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
             if (uiState.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))

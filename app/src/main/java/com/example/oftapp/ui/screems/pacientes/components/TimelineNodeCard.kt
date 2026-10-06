@@ -1,4 +1,4 @@
-﻿package com.example.oftapp.ui.screems.pacientes.components
+package com.example.oftapp.ui.screems.pacientes.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

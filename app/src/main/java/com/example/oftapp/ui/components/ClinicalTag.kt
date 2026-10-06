@@ -1,4 +1,4 @@
-﻿package com.example.oftapp.ui.components
+package com.example.oftapp.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
