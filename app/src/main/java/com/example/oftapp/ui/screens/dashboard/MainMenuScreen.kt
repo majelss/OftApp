@@ -15,7 +15,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.oftapp.ui.screens.auth.LoginScreen
 
 val DarkHeaderBlue = Color(0xFF004B72)
 val AccentPillBg = Color(0xFF1E5B82)
@@ -75,34 +74,20 @@ fun MainMenuScreen(
                     .padding(20.dp)
             ) {
                 Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.Top
+                    // Avatar del Médico
+                    Box(
+                        modifier = Modifier
+                            .size(64.dp)
+                            .background(Color.LightGray, shape = CircleShape)
                     ) {
-                        // Avatar del Médico
-                        Box(
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Foto Doctor",
+                            tint = Color.White,
                             modifier = Modifier
-                                .size(64.dp)
-                                .background(Color.LightGray, shape = CircleShape)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Foto Doctor",
-                                tint = Color.White,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(8.dp)
-                            )
-                        }
-
-                        IconButton(onClick = { /* Cerrar/Acción */ }) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "Cerrar",
-                                tint = Color.White
-                            )
-                        }
+                                .fillMaxSize()
+                                .padding(8.dp)
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))

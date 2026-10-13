@@ -33,7 +33,7 @@ val SecondaryButtonBg = Color(0xFFC7E7FF)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit = {} // Parámetro para conectar la navegación
+    onLoginSuccess: () -> Unit = {} // Parámetro listo para conectar el ruteo después
 ) {
     var email by remember { mutableStateOf("dr.valenzuela@clinicaofta.cl") }
     var password by remember { mutableStateOf("1234567890") }
@@ -260,8 +260,87 @@ fun LoginScreen(
                             }
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Enlace ¿Olvidó su contraseña?
+                    Text(
+                        text = "¿Olvidó su contraseña?",
+                        fontSize = 13.sp,
+                        color = PrimaryBlue,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // Botón Iniciar Sesión
+                    Button(
+                        onClick = { onLoginSuccess() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        shape = RoundedCornerShape(25.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("Iniciar Sesión", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Icon(Icons.Default.ArrowForward, contentDescription = null)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Botón Ingreso con Biometría
+                    Button(
+                        onClick = { onLoginSuccess() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        shape = RoundedCornerShape(25.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = SecondaryButtonBg,
+                            contentColor = PrimaryBlue
+                        )
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Fingerprint, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Ingreso con Biometría", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
                 }
             }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Pie de página (Legales y Seguridad)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier.size(14.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "Conexión Segura SSL  •  Ley 20.584 Ficha Clínica",
+                    fontSize = 11.sp,
+                    color = Color.Gray
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Cumplimiento de estándares de confidencialidad y resguardo de datos médicos oftalmológicos.",
+                fontSize = 10.sp,
+                color = Color.Gray,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
         }
     }
 }
