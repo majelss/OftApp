@@ -103,14 +103,6 @@ cd OftApp
 
 ---
 
-## Planificación del Proyecto (Trello)
-
-La organización de requerimientos, asignación de responsabilidades y seguimiento de pendientes se gestiona en el tablero de trabajo del equipo:
-
-* 📋 **Tablero Trello del Proyecto:** [Planificación OftApp - Duoc UC](https://trello.com/b/oftapp-dsy1105) *(o herramienta equivalente del equipo)*
-
----
-
 ## Tecnologías y Librerías
 
 * **Lenguaje:** Kotlin 2.2.10
