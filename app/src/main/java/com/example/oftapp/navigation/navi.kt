@@ -42,6 +42,7 @@ object Rutas {
 private fun resolverRuta(destino: String): String {
     val d = destino.lowercase()
     return when {
+        "login" in d || "cerrar" in d -> Rutas.LOGIN
         "historial" in d -> Rutas.historial()
         "detalle" in d -> Rutas.DETALLE_EXAMEN
         "atencion" in d -> Rutas.LISTA_ATENCIONES

@@ -16,6 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+import androidx.compose.material.icons.automirrored.filled.Logout
+
 val DarkHeaderBlue = Color(0xFF004B72)
 val AccentPillBg = Color(0xFF1E5B82)
 val SelectedItemBg = Color(0xFFD4EAFA)
@@ -25,45 +27,14 @@ val BadgeBg = Color(0xFFB3E5FC)
 fun MainMenuScreen(
     onNavigateTo: (String) -> Unit = {}
 ) {
-    var selectedBottomTab by remember { mutableIntStateOf(0) }
-
     Scaffold(
-        bottomBar = {
-            NavigationBar(
-                containerColor = Color(0xFFF8F9FC),
-                tonalElevation = 8.dp
-            ) {
-                NavigationBarItem(
-                    selected = selectedBottomTab == 0,
-                    onClick = { selectedBottomTab = 0 },
-                    icon = { Icon(Icons.Default.GridView, contentDescription = "Dashboard") },
-                    label = { Text("Dashboard", fontSize = 11.sp) }
-                )
-                NavigationBarItem(
-                    selected = selectedBottomTab == 1,
-                    onClick = { selectedBottomTab = 1 },
-                    icon = { Icon(Icons.Default.Assignment, contentDescription = "Atenciones") },
-                    label = { Text("Atenciones", fontSize = 11.sp) }
-                )
-                NavigationBarItem(
-                    selected = selectedBottomTab == 2,
-                    onClick = { selectedBottomTab = 2 },
-                    icon = { Icon(Icons.Default.MedicalServices, contentDescription = "Registro") },
-                    label = { Text("Registro", fontSize = 11.sp) }
-                )
-                NavigationBarItem(
-                    selected = selectedBottomTab == 3,
-                    onClick = { selectedBottomTab = 3 },
-                    icon = { Icon(Icons.Default.History, contentDescription = "Historial") },
-                    label = { Text("Historial", fontSize = 11.sp) }
-                )
-            }
-        }
+        containerColor = Color.White
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .navigationBarsPadding()
                 .background(Color.White)
         ) {
             // Header del Médico (Azul Oscuro)
@@ -71,6 +42,7 @@ fun MainMenuScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(DarkHeaderBlue)
+                    .statusBarsPadding()
                     .padding(20.dp)
             ) {
                 Column {
@@ -169,6 +141,29 @@ fun MainMenuScreen(
                     icon = Icons.Default.Visibility,
                     title = "Patologías & Agudeza",
                     onClick = { onNavigateTo("patologias") }
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                HorizontalDivider(
+                    color = Color(0xFFE2E8F0),
+                    thickness = 1.dp,
+                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 8.dp)
+                )
+
+                MenuItemRow(
+                    icon = Icons.AutoMirrored.Filled.Logout,
+                    title = "Cerrar Sesión",
+                    onClick = { onNavigateTo("login") }
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "OftApp v2.4 • Clínica Oftalmológica Central",
+                    fontSize = 11.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 8.dp)
                 )
             }
         }
