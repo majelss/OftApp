@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -57,6 +58,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import com.example.oftapp.ui.components.FechaExamenPicker
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -107,6 +112,13 @@ fun ExamRegisterScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let { viewModel.onArchivoSeleccionado(it, context) }
+    }
 
     LaunchedEffect(uiState.mensajeError) {
         uiState.mensajeError?.let {
@@ -259,6 +271,14 @@ fun ExamRegisterScreen(
                     onSelect = { viewModel.onSucursalSelected(it) }
                 )
 
+                Spacer(modifier = Modifier.height(18.dp))
+
+                // Integración nativa de Fecha/Hora (DatePicker y TimePicker del dispositivo)
+                FechaExamenPicker(
+                    fechaSeleccionada = uiState.fechaExamen,
+                    onFechaSeleccionada = { viewModel.onFechaExamenSeleccionada(it) }
+                )
+
                 Spacer(modifier = Modifier.height(20.dp))
 
                 // Sección: Selección de Ojo Evaluado (Lateralidad)
@@ -269,10 +289,10 @@ fun ExamRegisterScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Sección: Adjuntar Archivo / Resultado
+                // Sección: Adjuntar Archivo / Resultado (Integración File Picker real)
                 AdjuntarArchivoSection(
                     archivoAdjunto = uiState.documentoAdjunto,
-                    onAdjuntarClick = { viewModel.onAdjuntarArchivoSimulado() },
+                    onAdjuntarClick = { filePickerLauncher.launch("*/*") },
                     onEliminarClick = { viewModel.onEliminarArchivo() }
                 )
 
@@ -356,6 +376,7 @@ private fun TopAppBarContent(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .statusBarsPadding()
                 .padding(horizontal = 16.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
