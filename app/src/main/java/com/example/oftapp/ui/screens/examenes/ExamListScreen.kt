@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -39,6 +40,8 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -81,6 +84,7 @@ data class ItemAtencion(
 @Composable
 fun ExamListScreen(
     modifier: Modifier = Modifier,
+    viewModel: ExamListViewModel = viewModel(),
     onNavigateToDetalle: () -> Unit = {},
     onNavigateToRegistro: () -> Unit = {},
     onNavigateToDashboard: () -> Unit = {},
@@ -89,50 +93,7 @@ fun ExamListScreen(
     var searchQuery by remember { mutableStateOf("") }
     var filtroEstado by remember { mutableStateOf("Todos") }
 
-    val listaAtenciones = remember {
-        listOf(
-            ItemAtencion(
-                id = "#CP-2024-8841",
-                paciente = "Mariana González Riquelme",
-                rut = "14.821.903-2",
-                examen = "Campimetría Computarizada Humphrey 30-2",
-                ojo = "OD",
-                sucursal = "Sucursal Providencia - Box 3",
-                fecha = "24 Oct 2024 • 10:30",
-                estado = "Validado"
-            ),
-            ItemAtencion(
-                id = "#OCT-2024-4112",
-                paciente = "Carlos Venegas Soto",
-                rut = "18.332.194-K",
-                examen = "OCT Macular Alta Resolución",
-                ojo = "AO",
-                sucursal = "Sucursal Puerto Montt - Box 1",
-                fecha = "24 Oct 2024 • 09:15",
-                estado = "Pendiente"
-            ),
-            ItemAtencion(
-                id = "#TOP-2024-0982",
-                paciente = "Beatriz Morales Lara",
-                rut = "12.784.551-8",
-                examen = "Topografía Corneal Pentacam HR",
-                ojo = "OI",
-                sucursal = "Sucursal Las Condes - Box 5",
-                fecha = "23 Oct 2024 • 16:45",
-                estado = "Observado"
-            ),
-            ItemAtencion(
-                id = "#AV-2024-3310",
-                paciente = "Ignacio Silva Reyes",
-                rut = "16.920.104-3",
-                examen = "Agudeza Visual y Refracción Clínica",
-                ojo = "AO",
-                sucursal = "Sucursal Viña del Mar - Box 2",
-                fecha = "23 Oct 2024 • 11:20",
-                estado = "Validado"
-            )
-        )
-    }
+    val listaAtenciones by viewModel.atenciones.collectAsState(initial = emptyList())
 
     val listaFiltrada = listaAtenciones.filter { item ->
         val matchesSearch = item.paciente.contains(searchQuery, ignoreCase = true) ||
@@ -150,6 +111,7 @@ fun ExamListScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .statusBarsPadding()
                         .padding(horizontal = 16.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {

@@ -30,7 +30,8 @@ data class DocumentoAdjunto(
     val nombreArchivo: String,
     val tamano: String,
     val tiempoSubida: String,
-    val formato: String = "PDF"
+    val formato: String = "PDF",
+    val uri: String? = null
 )
 
 /**

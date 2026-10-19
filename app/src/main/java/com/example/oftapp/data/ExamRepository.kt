@@ -1,30 +1,26 @@
 package com.example.oftapp.data
 
+import android.content.Context
+import com.example.oftapp.data.local.ExamenDao
+import com.example.oftapp.data.local.ExamenEntity
+import com.example.oftapp.data.local.OftAppDatabase
 import com.example.oftapp.model.DocumentoAdjunto
 import com.example.oftapp.model.ExamenOftalmologico
 import com.example.oftapp.model.OjoEvaluado
 import com.example.oftapp.model.Paciente
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
 
 /**
- * Repositorio de datos clínicos simulados para OftApp.
- * Cumple con los requerimientos académicos DSY1105 de desacoplamiento MVVM y datos ficticios.
+ * Repositorio de datos clínicos de OftApp.
+ * Persiste los exámenes en Room (SQLite) para garantizar trazabilidad y persistencia de datos.
+ * Cumple con los requerimientos académicos DSY1105: arquitectura MVVM + Room.
  */
-class ExamRepository {
-
-    // Paciente por defecto de la pantalla
-    val pacienteMariana = Paciente(
-        rut = "14.821.903-2",
-        nombreCompleto = "Mariana González Riquelme",
-        edad = 42,
-        isValidado = true
-    )
+class ExamRepository(private val dao: ExamenDao) {
 
     // Catálogo de tipos de exámenes oftalmológicos
     val catalogoExamenes = listOf(
@@ -44,32 +40,27 @@ class ExamRepository {
         "Sucursal Viña del Mar - Box 2 Especialidades"
     )
 
-    // Lista en memoria de exámenes registrados
-    private val _examenes = MutableStateFlow<List<ExamenOftalmologico>>(
-        listOf(
-            ExamenOftalmologico(
-                id = "EXAM-2026-001",
-                paciente = pacienteMariana,
-                tipoExamen = "Campimetría Visual Computarizada 24-2",
-                protocolo = "Protocolo estándar SITA-Fast activado",
-                sucursalBox = "Sucursal Providencia - Box 3 Oftalmo",
-                ojoEvaluado = OjoEvaluado.DERECHO,
-                documentoAdjunto = DocumentoAdjunto(
-                    nombreArchivo = "resultado_oct_scan_01.pdf",
-                    tamano = "2.4 MB",
-                    tiempoSubida = "Subido hace 2 min"
-                ),
-                observaciones = "Sin hallazgos patológicos en cuadrante nasal superior.",
-                estado = "Validado",
-                fecha = "05/10/2026 09:41",
-                firmaElectronica = "Dr. C. Mendoza"
-            )
-        )
+    // Paciente por defecto para la ficha
+    val pacienteMariana = Paciente(
+        rut = "14.821.903-2",
+        nombreCompleto = "Mariana González Riquelme",
+        edad = 42,
+        isValidado = true
     )
-    val examenes: StateFlow<List<ExamenOftalmologico>> = _examenes.asStateFlow()
 
-    fun guardarExamen(examen: ExamenOftalmologico): Boolean {
-        _examenes.value = listOf(examen) + _examenes.value
+    /**
+     * Flow reactivo de exámenes almacenados en Room SQLite.
+     * Al registrar un nuevo examen, Room emite la lista actualizada automáticamente.
+     */
+    val examenes: Flow<List<ExamenOftalmologico>> = dao.obtenerTodos().map { lista ->
+        lista.map { it.toDomain() }
+    }
+
+    /**
+     * Guarda el examen en la base de datos SQLite con Room.
+     */
+    suspend fun guardarExamen(examen: ExamenOftalmologico): Boolean {
+        dao.insertarExamen(examen.toEntity())
         return true
     }
 
@@ -80,9 +71,11 @@ class ExamRepository {
         sucursal: String,
         ojo: OjoEvaluado,
         documento: DocumentoAdjunto?,
-        observaciones: String
+        observaciones: String,
+        fecha: String? = null
     ): ExamenOftalmologico {
         val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+        val fechaFinal = if (!fecha.isNullOrBlank()) fecha else sdf.format(Date())
         return ExamenOftalmologico(
             id = "EXAM-" + UUID.randomUUID().toString().take(8).uppercase(),
             paciente = paciente,
@@ -93,18 +86,74 @@ class ExamRepository {
             documentoAdjunto = documento,
             observaciones = observaciones,
             estado = "Pendiente",
-            fecha = sdf.format(Date()),
+            fecha = fechaFinal,
             firmaElectronica = "Dr. C. Mendoza"
         )
     }
+
+    // --- Mappers de Dominio a Room Entity ---
+
+    private fun ExamenEntity.toDomain(): ExamenOftalmologico {
+        val ojo = OjoEvaluado.entries.firstOrNull { it.codigo == ojoEvaluado }
+            ?: OjoEvaluado.DERECHO
+        val doc = if (documentoNombre != null) {
+            DocumentoAdjunto(
+                nombreArchivo = documentoNombre,
+                tamano = documentoTamano ?: "0 KB",
+                tiempoSubida = "Guardado localmente",
+                formato = documentoFormato ?: "PDF",
+                uri = documentoUri
+            )
+        } else null
+
+        return ExamenOftalmologico(
+            id = id,
+            paciente = Paciente(
+                rut = pacienteRut,
+                nombreCompleto = pacienteNombre,
+                edad = pacienteEdad,
+                isValidado = true
+            ),
+            tipoExamen = tipoExamen,
+            protocolo = protocolo,
+            sucursalBox = sucursalBox,
+            ojoEvaluado = ojo,
+            documentoAdjunto = doc,
+            observaciones = observaciones,
+            estado = estado,
+            fecha = fecha,
+            firmaElectronica = firmaElectronica
+        )
+    }
+
+    private fun ExamenOftalmologico.toEntity(): ExamenEntity = ExamenEntity(
+        id = id,
+        pacienteRut = paciente.rut,
+        pacienteNombre = paciente.nombreCompleto,
+        pacienteEdad = paciente.edad,
+        tipoExamen = tipoExamen,
+        protocolo = protocolo,
+        sucursalBox = sucursalBox,
+        ojoEvaluado = ojoEvaluado.codigo,
+        documentoNombre = documentoAdjunto?.nombreArchivo,
+        documentoTamano = documentoAdjunto?.tamano,
+        documentoFormato = documentoAdjunto?.formato,
+        documentoUri = documentoAdjunto?.uri,
+        observaciones = observaciones,
+        estado = estado,
+        fecha = fecha,
+        firmaElectronica = firmaElectronica
+    )
 
     companion object {
         @Volatile
         private var instance: ExamRepository? = null
 
-        fun getInstance(): ExamRepository {
+        fun getInstance(context: Context): ExamRepository {
             return instance ?: synchronized(this) {
-                instance ?: ExamRepository().also { instance = it }
+                instance ?: ExamRepository(
+                    OftAppDatabase.getInstance(context).examenDao()
+                ).also { instance = it }
             }
         }
     }
