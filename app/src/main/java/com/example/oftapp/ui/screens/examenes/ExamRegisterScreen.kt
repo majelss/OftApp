@@ -906,11 +906,11 @@ private fun LateralidadSection(
                             .background(badgeBg),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = ojo.codigo,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = badgeTextCol
+                        Icon(
+                            imageVector = Icons.Default.Visibility,
+                            contentDescription = ojo.titulo,
+                            tint = badgeTextCol,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
 

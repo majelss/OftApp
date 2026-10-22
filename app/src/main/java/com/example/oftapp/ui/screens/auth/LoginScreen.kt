@@ -1,5 +1,6 @@
 package com.example.oftapp.ui.screens.auth
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -36,8 +37,18 @@ fun LoginScreen(
     onLoginSuccess: () -> Unit = {} // Parámetro listo para conectar el ruteo después
 ) {
     var email by remember { mutableStateOf("dr.valenzuela@clinicaofta.cl") }
-    var password by remember { mutableStateOf("1234567890") }
+    var password by remember { mutableStateOf("dr123456") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    val validarEIniciar = {
+        if (email.trim() == "dr.valenzuela@clinicaofta.cl" && password == "dr123456") {
+            errorMessage = null
+            onLoginSuccess()
+        } else {
+            errorMessage = "Credenciales incorrectas. Verifique su usuario y contraseña."
+        }
+    }
 
     // Estado del selector de Rol
     var expandedRol by remember { mutableStateOf(false) }
@@ -141,7 +152,7 @@ fun LoginScreen(
                     Spacer(modifier = Modifier.height(6.dp))
                     OutlinedTextField(
                         value = email,
-                        onValueChange = { email = it },
+                        onValueChange = { email = it; errorMessage = null },
                         modifier = Modifier.fillMaxWidth(),
                         leadingIcon = {
                             Icon(
@@ -172,7 +183,7 @@ fun LoginScreen(
                     Spacer(modifier = Modifier.height(6.dp))
                     OutlinedTextField(
                         value = password,
-                        onValueChange = { password = it },
+                        onValueChange = { password = it; errorMessage = null },
                         modifier = Modifier.fillMaxWidth(),
                         leadingIcon = {
                             Icon(Icons.Default.Lock, contentDescription = null, tint = PrimaryBlue)
@@ -276,9 +287,38 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
+                    if (errorMessage != null) {
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(10.dp),
+                            color = Color(0xFFFFEBEE),
+                            border = BorderStroke(1.dp, Color(0xFFEF9A9A))
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ErrorOutline,
+                                    contentDescription = null,
+                                    tint = Color(0xFFC62828),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = errorMessage!!,
+                                    color = Color(0xFFC62828),
+                                    fontSize = 12.5.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
                     // Botón Iniciar Sesión
                     Button(
-                        onClick = { onLoginSuccess() },
+                        onClick = { validarEIniciar() },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
@@ -296,7 +336,7 @@ fun LoginScreen(
 
                     // Botón Ingreso con Biometría
                     Button(
-                        onClick = { onLoginSuccess() },
+                        onClick = { validarEIniciar() },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
