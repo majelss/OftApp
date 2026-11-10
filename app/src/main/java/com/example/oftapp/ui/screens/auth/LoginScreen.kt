@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.oftapp.model.Roles
 
 // Colores personalizados del diseño
 val PrimaryBlue = Color(0xFF006689)
@@ -34,30 +35,40 @@ val SecondaryButtonBg = Color(0xFFC7E7FF)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit = {} // Parámetro listo para conectar el ruteo después
+    onLoginSuccess: (usuarioId: Long, rol: String) -> Unit = { _, _ -> }
 ) {
     var email by remember { mutableStateOf("dr.valenzuela@clinicaofta.cl") }
     var password by remember { mutableStateOf("dr123456") }
     var passwordVisible by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    val validarEIniciar = {
-        if (email.trim() == "dr.valenzuela@clinicaofta.cl" && password == "dr123456") {
-            errorMessage = null
-            onLoginSuccess()
-        } else {
-            errorMessage = "Credenciales incorrectas. Verifique su usuario y contraseña."
-        }
-    }
-
     // Estado del selector de Rol
     var expandedRol by remember { mutableStateOf(false) }
     val roles = listOf(
         "Médico Oftalmólogo" to "Acceso diagnóstico completo (OD / OS)",
+        "Paciente" to "Consulta de exámenes e historial",
         "Administrativo" to "Gestión de citas y pacientes",
         "Técnico Médica" to "Ingreso de exámenes preliminares"
     )
     var selectedRol by remember { mutableStateOf(roles[0]) }
+
+    val validarEIniciar = {
+        // Mapeo simple del rol seleccionado en UI a la constante del sistema
+        val rolCodigo = when (selectedRol.first) {
+            "Paciente" -> Roles.PACIENTE
+            "Administrativo" -> Roles.ADMINISTRATIVO
+            "Técnico Médica" -> Roles.TECNICO
+            else -> Roles.MEDICO
+        }
+
+        if (email.isNotBlank() && password.isNotBlank()) {
+            errorMessage = null
+            // Enviamos un ID de prueba (ej: 1L para paciente) y el rol
+            onLoginSuccess(1L, rolCodigo)
+        } else {
+            errorMessage = "Credenciales incorrectas. Verifique su usuario y contraseña."
+        }
+    }
 
     Box(
         modifier = Modifier
