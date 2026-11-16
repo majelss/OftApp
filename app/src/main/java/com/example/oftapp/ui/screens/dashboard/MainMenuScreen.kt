@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,8 +16,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-import androidx.compose.material.icons.automirrored.filled.Logout
 
 val DarkHeaderBlue = Color(0xFF004B72)
 val AccentPillBg = Color(0xFF1E5B82)
@@ -105,7 +104,7 @@ fun MainMenuScreen(
                 }
             }
 
-            // Opciones de Menú
+            // Opciones de Menú (Exclusivas del Personal Médico)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -163,7 +162,9 @@ fun MainMenuScreen(
                     text = "OftApp v2.4 • Clínica Oftalmológica Central",
                     fontSize = 11.sp,
                     color = Color.Gray,
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 8.dp)
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(bottom = 8.dp)
                 )
             }
         }

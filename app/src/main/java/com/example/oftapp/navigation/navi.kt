@@ -8,7 +8,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.oftapp.PlaceholderScreen
 import com.example.oftapp.model.EstadoSesion
+import com.example.oftapp.model.esAdmin
 import com.example.oftapp.model.esPaciente
+import com.example.oftapp.ui.screens.admin.AdminAuditScreen
+import com.example.oftapp.ui.screens.admin.AdminSystemConfigScreen
+import com.example.oftapp.ui.screens.admin.AdminTab
+import com.example.oftapp.ui.screens.admin.AdminUserFormScreen
 import com.example.oftapp.ui.screens.auth.LoginScreen
 import com.example.oftapp.ui.screens.dashboard.DashboardScreen
 import com.example.oftapp.ui.screens.dashboard.MainMenuScreen
@@ -44,6 +49,11 @@ object Rutas {
     const val DETALLE_EXAMEN = "detalle_examen"
     const val PATOLOGIAS = "patologias"
 
+    // Rutas exclusivas del rol Administrador ("Clinical Clarity")
+    const val ADMIN_USUARIOS = "admin_usuarios"
+    const val ADMIN_SISTEMA = "admin_sistema"
+    const val ADMIN_AUDITORIA = "admin_auditoria"
+
     const val PACIENTE_ID_DEFECTO = 1L
 
     fun historialMedico(pacienteId: Long = PACIENTE_ID_DEFECTO): String = "$HISTORIAL/$pacienteId"
@@ -56,25 +66,37 @@ private fun resolverRuta(destino: String, estadoSesion: EstadoSesion): String {
     val d = destino.lowercase()
     if ("login" in d || "cerrar" in d) return Rutas.LOGIN
 
-    return if (estadoSesion.esPaciente()) {
-        when {
-            "compartir" in d -> Rutas.PACIENTE_COMPARTIR
-            "perfil" in d -> Rutas.PACIENTE_PERFIL
-            "examenes" in d -> Rutas.PACIENTE_EXAMENES
-            "historial" in d -> Rutas.PACIENTE_HISTORIAL
-            "detalle" in d -> Rutas.DETALLE_EXAMEN
-            "inicio" in d || "home" in d -> Rutas.PACIENTE_HOME
-            else -> Rutas.PACIENTE_HOME
+    return when {
+        estadoSesion.esPaciente() -> {
+            when {
+                "compartir" in d -> Rutas.PACIENTE_COMPARTIR
+                "perfil" in d -> Rutas.PACIENTE_PERFIL
+                "examenes" in d -> Rutas.PACIENTE_EXAMENES
+                "historial" in d -> Rutas.PACIENTE_HISTORIAL
+                "detalle" in d -> Rutas.DETALLE_EXAMEN
+                "inicio" in d || "home" in d -> Rutas.PACIENTE_HOME
+                else -> Rutas.PACIENTE_HOME
+            }
         }
-    } else {
-        when {
-            "historial" in d -> Rutas.historialMedico()
-            "detalle" in d -> Rutas.DETALLE_EXAMEN
-            "atencion" in d -> Rutas.LISTA_ATENCIONES
-            "registr" in d || "examen" in d -> Rutas.REGISTRAR_EXAMEN
-            "dashboard" in d -> Rutas.DASHBOARD
-            "inicio" in d || "menu" in d -> Rutas.MAIN_MENU
-            else -> Rutas.MAIN_MENU
+        estadoSesion.esAdmin() -> {
+            when {
+                "usuarios" in d -> Rutas.ADMIN_USUARIOS
+                "sistema" in d || "config" in d || "catalogo" in d -> Rutas.ADMIN_SISTEMA
+                "audit" in d -> Rutas.ADMIN_AUDITORIA
+                else -> Rutas.ADMIN_USUARIOS
+            }
+        }
+        else -> {
+            when {
+                "historial" in d -> Rutas.historialMedico()
+                "detalle" in d -> Rutas.DETALLE_EXAMEN
+                "atencion" in d -> Rutas.LISTA_ATENCIONES
+                "registr" in d || "examen" in d -> Rutas.REGISTRAR_EXAMEN
+                "dashboard" in d -> Rutas.DASHBOARD
+                "patolog" in d -> Rutas.PATOLOGIAS
+                "inicio" in d || "menu" in d -> Rutas.MAIN_MENU
+                else -> Rutas.MAIN_MENU
+            }
         }
     }
 }
@@ -86,8 +108,37 @@ fun AppNavigation() {
     // Estado global de la sesión del usuario
     var estadoSesion by remember { mutableStateOf(EstadoSesion()) }
 
+    val cerrarSesionGlobal: () -> Unit = {
+        estadoSesion = EstadoSesion(
+            usuarioId = null,
+            rol = null,
+            estaAutenticado = false
+        )
+        navController.navigate(Rutas.LOGIN) {
+            popUpTo(0) { inclusive = true }
+            launchSingleTop = true
+        }
+    }
+
     val navegar: (String) -> Unit = { destino ->
-        navController.navigate(resolverRuta(destino, estadoSesion))
+        val d = destino.lowercase()
+        if ("login" in d || "cerrar" in d) {
+            cerrarSesionGlobal()
+        } else {
+            navController.navigate(resolverRuta(destino, estadoSesion))
+        }
+    }
+
+    val navegarTabAdmin: (AdminTab) -> Unit = { tab ->
+        val ruta = when (tab) {
+            AdminTab.USUARIOS -> Rutas.ADMIN_USUARIOS
+            AdminTab.CATALOGOS -> Rutas.ADMIN_SISTEMA
+            AdminTab.SISTEMA -> Rutas.ADMIN_SISTEMA
+            AdminTab.AUDITORIA -> Rutas.ADMIN_AUDITORIA
+        }
+        navController.navigate(ruta) {
+            launchSingleTop = true
+        }
     }
 
     NavHost(
@@ -104,10 +155,10 @@ fun AppNavigation() {
                         estaAutenticado = true
                     )
 
-                    val rutaInicio = if (estadoSesion.esPaciente()) {
-                        Rutas.PACIENTE_HOME
-                    } else {
-                        Rutas.MAIN_MENU
+                    val rutaInicio = when {
+                        estadoSesion.esPaciente() -> Rutas.PACIENTE_HOME
+                        estadoSesion.esAdmin() -> Rutas.ADMIN_USUARIOS
+                        else -> Rutas.MAIN_MENU
                     }
 
                     navController.navigate(rutaInicio) {
@@ -213,19 +264,7 @@ fun AppNavigation() {
                 PacientePerfilScreen(
                     nombrePaciente = "Mariana González R.",
                     rutPaciente = "15.420.891-K",
-                    onCerrarSesion = {
-                        // Resetear la sesión por completo
-                        estadoSesion = EstadoSesion(
-                            usuarioId = null,
-                            rol = null,
-                            estaAutenticado = false
-                        )
-                        // Redirigir al login limpiando toda la pila de pantallas
-                        navController.navigate(Rutas.LOGIN) {
-                            popUpTo(0) { inclusive = true }
-                            launchSingleTop = true
-                        }
-                    },
+                    onCerrarSesion = cerrarSesionGlobal,
                     onNavegarItemBottomBar = { destino ->
                         when (destino) {
                             "inicio" -> navController.navigate(Rutas.PACIENTE_HOME)
@@ -271,7 +310,7 @@ fun AppNavigation() {
 
         // --- 3. FLUJO DEL PERSONAL MÉDICO (AISLADO) ---
         composable(Rutas.MAIN_MENU) {
-            if (estadoSesion.estaAutenticado && !estadoSesion.esPaciente()) {
+            if (estadoSesion.estaAutenticado && !estadoSesion.esPaciente() && !estadoSesion.esAdmin()) {
                 MainMenuScreen(onNavigateTo = navegar)
             } else {
                 LaunchedEffect(Unit) {
@@ -283,7 +322,7 @@ fun AppNavigation() {
         }
 
         composable(Rutas.DASHBOARD) {
-            if (estadoSesion.estaAutenticado && !estadoSesion.esPaciente()) {
+            if (estadoSesion.estaAutenticado && !estadoSesion.esPaciente() && !estadoSesion.esAdmin()) {
                 DashboardScreen(onNavegar = navegar)
             } else {
                 LaunchedEffect(Unit) {
@@ -295,7 +334,7 @@ fun AppNavigation() {
         }
 
         composable(Rutas.LISTA_ATENCIONES) {
-            if (estadoSesion.estaAutenticado && !estadoSesion.esPaciente()) {
+            if (estadoSesion.estaAutenticado && !estadoSesion.esPaciente() && !estadoSesion.esAdmin()) {
                 ExamListScreen(
                     onNavigateToDetalle = { navController.navigate(Rutas.DETALLE_EXAMEN) },
                     onNavigateToRegistro = { navController.navigate(Rutas.REGISTRAR_EXAMEN) },
@@ -312,7 +351,7 @@ fun AppNavigation() {
         }
 
         composable(Rutas.REGISTRAR_EXAMEN) {
-            if (estadoSesion.estaAutenticado && !estadoSesion.esPaciente()) {
+            if (estadoSesion.estaAutenticado && !estadoSesion.esPaciente() && !estadoSesion.esAdmin()) {
                 ExamRegisterScreen(
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateToDashboard = { navController.navigate(Rutas.DASHBOARD) },
@@ -333,7 +372,7 @@ fun AppNavigation() {
             route = "${Rutas.HISTORIAL}/{pacienteId}",
             arguments = listOf(navArgument("pacienteId") { type = NavType.LongType })
         ) { backStackEntry ->
-            if (estadoSesion.estaAutenticado && !estadoSesion.esPaciente()) {
+            if (estadoSesion.estaAutenticado && !estadoSesion.esPaciente() && !estadoSesion.esAdmin()) {
                 val pacienteId = backStackEntry.arguments?.getLong("pacienteId")
                     ?: Rutas.PACIENTE_ID_DEFECTO
 
@@ -352,9 +391,55 @@ fun AppNavigation() {
             }
         }
 
-        // --- 4. DETALLE Y PANTALLAS COMPARTIDAS / GENERALES ---
+        // --- 4. FLUJO EXCLUSIVO DEL ROL ADMINISTRADOR (AISLADO) ---
+        composable(Rutas.ADMIN_USUARIOS) {
+            if (estadoSesion.estaAutenticado && estadoSesion.esAdmin()) {
+                AdminUserFormScreen(
+                    onNavigateBack = cerrarSesionGlobal,
+                    onNavigateTab = navegarTabAdmin
+                )
+            } else {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Rutas.LOGIN) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            }
+        }
+
+        composable(Rutas.ADMIN_SISTEMA) {
+            if (estadoSesion.estaAutenticado && estadoSesion.esAdmin()) {
+                AdminSystemConfigScreen(
+                    onNavigateBack = cerrarSesionGlobal,
+                    onNavigateTab = navegarTabAdmin
+                )
+            } else {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Rutas.LOGIN) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            }
+        }
+
+        composable(Rutas.ADMIN_AUDITORIA) {
+            if (estadoSesion.estaAutenticado && estadoSesion.esAdmin()) {
+                AdminAuditScreen(
+                    onNavigateBack = cerrarSesionGlobal,
+                    onNavigateTab = navegarTabAdmin
+                )
+            } else {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Rutas.LOGIN) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            }
+        }
+
+        // --- 5. DETALLE Y PANTALLAS COMPARTIDAS / GENERALES ---
         composable(Rutas.DETALLE_EXAMEN) {
-            if (estadoSesion.estaAutenticado) {
+            if (estadoSesion.estaAutenticado && !estadoSesion.esAdmin()) {
                 if (estadoSesion.esPaciente()) {
                     PacienteExamDetailScreen(onNavigateBack = { navController.popBackStack() })
                 } else {
@@ -370,10 +455,18 @@ fun AppNavigation() {
         }
 
         composable(Rutas.PATOLOGIAS) {
-            PlaceholderScreen(
-                titulo = "Patologías & Agudeza",
-                onBack = { navController.popBackStack() }
-            )
+            if (estadoSesion.estaAutenticado && !estadoSesion.esPaciente() && !estadoSesion.esAdmin()) {
+                PlaceholderScreen(
+                    titulo = "Patologías & Agudeza",
+                    onBack = { navController.popBackStack() }
+                )
+            } else {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Rutas.LOGIN) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            }
         }
     }
 }

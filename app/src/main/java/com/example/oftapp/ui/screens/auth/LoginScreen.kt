@@ -47,6 +47,7 @@ fun LoginScreen(
     val roles = listOf(
         "Médico Oftalmólogo" to "Acceso diagnóstico completo (OD / OS)",
         "Paciente" to "Consulta de exámenes e historial",
+        "Administrador" to "Gestión de usuarios, sistema y auditoría SIS",
         "Administrativo" to "Gestión de citas y pacientes",
         "Técnico Médica" to "Ingreso de exámenes preliminares"
     )
@@ -56,6 +57,7 @@ fun LoginScreen(
         // Mapeo simple del rol seleccionado en UI a la constante del sistema
         val rolCodigo = when (selectedRol.first) {
             "Paciente" -> Roles.PACIENTE
+            "Administrador" -> Roles.ADMINISTRADOR
             "Administrativo" -> Roles.ADMINISTRATIVO
             "Técnico Médica" -> Roles.TECNICO
             else -> Roles.MEDICO
