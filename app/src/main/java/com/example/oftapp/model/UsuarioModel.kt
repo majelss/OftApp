@@ -3,6 +3,7 @@ package com.example.oftapp.model
 object Roles {
     const val PACIENTE = "PACIENTE"
     const val MEDICO = "MEDICO"
+    const val ADMINISTRADOR = "ADMINISTRADOR"
     const val ADMINISTRATIVO = "ADMINISTRATIVO"
     const val TECNICO = "TECNICO"
     const val INVITADO = "INVITADO"
@@ -15,3 +16,5 @@ data class EstadoSesion(
 )
 
 fun EstadoSesion.esPaciente(): Boolean = rol.equals(Roles.PACIENTE, ignoreCase = true)
+
+fun EstadoSesion.esAdmin(): Boolean = rol.equals(Roles.ADMINISTRADOR, ignoreCase = true)
