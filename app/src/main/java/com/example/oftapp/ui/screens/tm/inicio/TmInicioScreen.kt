@@ -26,7 +26,8 @@ import com.example.oftapp.ui.theme.ClinicalClarityColors
 fun TmInicioScreen(
     onNuevoExamen: () -> Unit = {},
     onVerMisRegistros: () -> Unit = {},
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
+    onVerPerfil: () -> Unit = {}
 ) {
     val bgSurface = Color(0xFFF8F9FF)
     val cardBg = Color(0xFFFFFFFF)
@@ -70,14 +71,16 @@ fun TmInicioScreen(
                 IconButton(onClick = {}) {
                     Icon(Icons.Outlined.Notifications, contentDescription = "Notificaciones", tint = Color(0xFF3F484E))
                 }
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(primaryColor),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(Icons.Default.Person, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
+                IconButton(onClick = onVerPerfil) {
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(primaryColor),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Default.Person, contentDescription = "Perfil", tint = Color.White, modifier = Modifier.size(20.dp))
+                    }
                 }
             }
         }

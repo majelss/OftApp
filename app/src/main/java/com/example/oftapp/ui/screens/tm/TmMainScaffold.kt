@@ -89,7 +89,8 @@ fun TmMainScaffold(
                 TmInicioScreen(
                     onNavigateBack = { /* root, no-op */ },
                     onNuevoExamen = { tmNavController.navigate(TmRutas.REGISTRAR) },
-                    onVerMisRegistros = { tmNavController.navigate(TmRutas.REGISTROS) }
+                    onVerMisRegistros = { tmNavController.navigate(TmRutas.REGISTROS) },
+                    onVerPerfil = { tmNavController.navigate(TmRutas.PERFIL) }
                 )
             }
             composable(TmRutas.REGISTRAR) {
