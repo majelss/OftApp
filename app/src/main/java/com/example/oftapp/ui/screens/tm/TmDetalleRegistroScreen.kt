@@ -101,7 +101,7 @@ fun TmDetalleRegistroScreen(
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Outlined.ClinicalNotes, contentDescription = null, tint = primaryColor, modifier = Modifier.size(14.dp))
+                        Icon(Icons.Outlined.Description, contentDescription = null, tint = primaryColor, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("Rol: T.M. Oftalmología", fontSize = 10.sp, color = Color(0xFF0D1C2F), fontWeight = FontWeight.Medium)
                     }
@@ -241,7 +241,7 @@ fun TmDetalleRegistroScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Outlined.Tune, contentDescription = null, tint = primaryColor, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Outlined.Settings, contentDescription = null, tint = primaryColor, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
                             Text("Parámetros Técnicos Registrados", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFF0D1C2F))
                         }
@@ -255,7 +255,7 @@ fun TmDetalleRegistroScreen(
                     Row(verticalAlignment = Alignment.Top) {
                         Surface(color = Color(0xFFE6EEFF), shape = RoundedCornerShape(8.dp), modifier = Modifier.size(32.dp)) {
                             Box(contentAlignment = Alignment.Center) {
-                                Icon(Icons.Outlined.Biotech, contentDescription = null, tint = primaryColor, modifier = Modifier.size(18.dp))
+                                Icon(Icons.Outlined.Science, contentDescription = null, tint = primaryColor, modifier = Modifier.size(18.dp))
                             }
                         }
                         Spacer(modifier = Modifier.width(10.dp))
@@ -285,7 +285,7 @@ fun TmDetalleRegistroScreen(
                     Row(verticalAlignment = Alignment.Top) {
                         Surface(color = Color(0xFFE6EEFF), shape = RoundedCornerShape(8.dp), modifier = Modifier.size(32.dp)) {
                             Box(contentAlignment = Alignment.Center) {
-                                Icon(Icons.Outlined.Badge, contentDescription = null, tint = primaryColor, modifier = Modifier.size(18.dp))
+                                Icon(Icons.Outlined.AccountCircle, contentDescription = null, tint = primaryColor, modifier = Modifier.size(18.dp))
                             }
                         }
                         Spacer(modifier = Modifier.width(10.dp))
@@ -469,7 +469,7 @@ fun TmDetalleRegistroScreen(
                     onClick = onEditarExamen,
                     modifier = Modifier.fillMaxWidth().height(44.dp)
                 ) {
-                    Icon(Icons.Outlined.EditNote, contentDescription = null, tint = primaryColor, modifier = Modifier.size(18.dp))
+                    Icon(Icons.Default.Edit, contentDescription = null, tint = primaryColor, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(6.dp))
                     Text("Editar datos técnicos del examen", fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = primaryColor)
                 }
@@ -498,7 +498,7 @@ fun TmDetalleRegistroScreen(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.Top) {
-                    Icon(Icons.Outlined.LockClock, contentDescription = null, tint = primaryColor, modifier = Modifier.size(18.dp))
+                    Icon(Icons.Outlined.Lock, contentDescription = null, tint = primaryColor, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         "Al enviar a revisión médica, el registro se bloqueará para edición técnica y quedará disponible para el Médico Oftalmólogo asignado.",
@@ -518,7 +518,7 @@ fun TmDetalleRegistroScreen(
                 icon = {
                     Surface(color = Color(0xFF6FF2FE), shape = CircleShape, modifier = Modifier.size(48.dp)) {
                         Box(contentAlignment = Alignment.Center) {
-                            Icon(Icons.Outlined.ForwardToInbox, contentDescription = null, tint = Color(0xFF006E75), modifier = Modifier.size(24.dp))
+                            Icon(Icons.Default.Send, contentDescription = null, tint = Color(0xFF006E75), modifier = Modifier.size(24.dp))
                         }
                     }
                 },

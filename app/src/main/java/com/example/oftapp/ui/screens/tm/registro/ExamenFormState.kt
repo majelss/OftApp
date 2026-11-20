@@ -1,6 +1,5 @@
 package com.example.oftapp.ui.screens.tm.registro
 
-import com.example.oftapp.domain.EstadoExamen
 import java.time.LocalDate
 
 /**

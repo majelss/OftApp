@@ -175,7 +175,7 @@ fun TmRegistroScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Outlined.Badge, contentDescription = null, tint = primaryColor, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Outlined.AccountCircle, contentDescription = null, tint = primaryColor, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
                             Text("RUT del Paciente *", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFF0D1C2F))
                         }
@@ -267,7 +267,7 @@ fun TmRegistroScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.Biotech, contentDescription = null, tint = primaryColor, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Outlined.Science, contentDescription = null, tint = primaryColor, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text("Tipo de Examen Oftalmológico *", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFF0D1C2F))
                     }
@@ -472,7 +472,7 @@ fun TmRegistroScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Outlined.ClinicalNotes, contentDescription = null, tint = primaryColor, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Outlined.Description, contentDescription = null, tint = primaryColor, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
                             Text("Observaciones Técnicas Generales", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFF0D1C2F))
                         }
@@ -547,7 +547,7 @@ fun TmRegistroScreen(
                         ) {
                             Surface(color = Color(0xFFDDE9FF), shape = CircleShape, modifier = Modifier.size(42.dp)) {
                                 Box(contentAlignment = Alignment.Center) {
-                                    Icon(Icons.Outlined.UploadFile, contentDescription = null, tint = primaryColor)
+                                    Icon(Icons.Outlined.CloudUpload, contentDescription = null, tint = primaryColor)
                                 }
                             }
                             Spacer(modifier = Modifier.height(8.dp))

@@ -74,7 +74,7 @@ fun TmMainScaffold(
                             launchSingleTop = true
                         }
                     },
-                    icon = { Icon(Icons.Default.Badge, contentDescription = "Perfil") },
+                    icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Perfil") },
                     label = { Text("Perfil") }
                 )
             }

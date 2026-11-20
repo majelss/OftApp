@@ -176,7 +176,7 @@ fun TmMisRegistrosScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             if (isSelected) {
-                                Icon(Icons.Outlined.Layers, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+                                Icon(Icons.Outlined.Dashboard, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
                             } else {
                                 Box(
@@ -329,7 +329,7 @@ fun RegistroExamenCard(
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            if (esEditable) Icons.Outlined.AssignmentLate else Icons.Default.Lock,
+                            if (esEditable) Icons.Default.Assignment else Icons.Default.Lock,
                             contentDescription = null,
                             tint = if (esEditable) Color(0xFF006385) else Color(0xFF6F787F),
                             modifier = Modifier.size(14.dp)
@@ -412,7 +412,7 @@ fun RegistroExamenCard(
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.PersonCheck, contentDescription = null, tint = Color(0xFF006385), modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Person, contentDescription = null, tint = Color(0xFF006385), modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(infoAdicional, fontSize = 11.sp, color = Color(0xFF0D1C2F))
                     }

@@ -109,7 +109,7 @@ fun TmInicioScreen(
                 Text("Área de Oftalmología Diagnóstica", fontSize = 12.sp, color = Color(0xFF3F484E))
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Outlined.Domain, contentDescription = null, modifier = Modifier.size(14.dp), tint = primaryColor)
+                    Icon(Icons.Outlined.Business, contentDescription = null, modifier = Modifier.size(14.dp), tint = primaryColor)
                     Spacer(modifier = Modifier.width(4.dp))
                     Text("Turno Mañana • Box 4 Diagnóstico", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = primaryColor)
                 }
@@ -133,7 +133,7 @@ fun TmInicioScreen(
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                     Surface(color = Color(0xFFFEF3C7), shape = CircleShape, modifier = Modifier.size(36.dp)) {
                         Box(contentAlignment = Alignment.Center) {
-                            Icon(Icons.Outlined.HourglassEmpty, contentDescription = null, tint = Color(0xFFD97706), modifier = Modifier.size(20.dp))
+                            Icon(Icons.Outlined.Timer, contentDescription = null, tint = Color(0xFFD97706), modifier = Modifier.size(20.dp))
                         }
                     }
                     Spacer(modifier = Modifier.width(12.dp))
