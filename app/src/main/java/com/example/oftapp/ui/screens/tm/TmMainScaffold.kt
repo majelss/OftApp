@@ -12,13 +12,20 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.oftapp.ui.screens.tm.inicio.TmInicioScreen
+import com.example.oftapp.ui.screens.tm.registro.TmRegistroScreen
+import com.example.oftapp.model.TmRegistroExamen
+import com.example.oftapp.model.TmEstadoExamen
+import com.example.oftapp.ui.screens.tm.TmDetalleRegistroScreen
+import com.example.oftapp.ui.screens.tm.TmPerfilScreen
 
 /**
  * Scaffold principal del módulo Tecnólogo Médico.
  * Tiene su propio NavController interno para la barra inferior.
  */
 @Composable
-fun TmMainScaffold() {
+fun TmMainScaffold(
+    onLogoutToLogin: () -> Unit = {}
+) {
     val tmNavController = rememberNavController()
     val navBackStackEntry by tmNavController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -79,23 +86,43 @@ fun TmMainScaffold() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(TmRutas.INICIO) {
-                TmInicioScreen(onNavigate = { tmNavController.navigate(it) })
+                TmInicioScreen(
+                    onNavigateBack = { /* root, no-op */ },
+                    onNuevoExamen = { tmNavController.navigate(TmRutas.REGISTRAR) },
+                    onVerMisRegistros = { tmNavController.navigate(TmRutas.REGISTROS) }
+                )
             }
             composable(TmRutas.REGISTRAR) {
-                // TODO: reemplazar con TmRegistrarExamenScreen real
-                Text("Pantalla Registrar Examen — En desarrollo")
+                TmRegistroScreen(
+                    onNavigateBack = { tmNavController.popBackStack() },
+                    onExamenEnviado = { tmNavController.navigate(TmRutas.REGISTROS) }
+                )
             }
             composable(TmRutas.REGISTROS) {
-                // TODO: reemplazar con TmMisRegistrosScreen real
-                Text("Pantalla Mis Registros — En desarrollo")
+                TmMisRegistrosScreen(
+                    onNavigateBack = { tmNavController.popBackStack() },
+                    onVerDetalle = { tmNavController.navigate(TmRutas.DETALLE) },
+                    onEditarRegistro = { tmNavController.navigate(TmRutas.REGISTRAR) },
+                    listaExamenes = emptyList()
+                )
             }
             composable(TmRutas.DETALLE) {
-                // TODO: reemplazar con TmDetalleRegistroScreen real
-                Text("Pantalla Detalle Registro — En desarrollo")
+                TmDetalleRegistroScreen(
+                    onNavigateBack = { tmNavController.popBackStack() },
+                    onEditarExamen = { tmNavController.navigate(TmRutas.REGISTRAR) },
+                    examen = TmRegistroExamen(
+                        id = "1",
+                        paciente = com.example.oftapp.model.TmPaciente(rut = "15.420.891-K", nombreCompleto = "Mariana González R."),
+                        tipoExamen = "Campimetría Computarizada Humphrey",
+                        estado = TmEstadoExamen.VALIDADO
+                    )
+                )
             }
             composable(TmRutas.PERFIL) {
-                // TODO: reemplazar con TmPerfilScreen real
-                Text("Pantalla Perfil T.M. — En desarrollo")
+                TmPerfilScreen(
+                    onNavigateBack = { tmNavController.popBackStack() },
+                    onLogout = onLogoutToLogin
+                )
             }
         }
     }

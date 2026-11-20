@@ -86,7 +86,14 @@ fun AppNavigation() {
 
         // ─── Tecnólogo Médico (scaffold propio con bottom bar) ──
         composable(Rutas.TM_MAIN) {
-            TmMainScaffold()
+            TmMainScaffold(
+                onLogoutToLogin = {
+                    SesionActual.cerrarSesion()
+                    navController.navigate(Rutas.LOGIN) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
         }
 
         // ─── Paciente (pantalla principal del paciente) ─────────
