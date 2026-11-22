@@ -1,5 +1,12 @@
 package com.example.oftapp.ui.screens.pacientes
 
+import com.example.oftapp.viewmodel.EventoTimeline
+import com.example.oftapp.viewmodel.FiltroTimeline
+import com.example.oftapp.viewmodel.PacienteUi
+import com.example.oftapp.viewmodel.PatientHistoryUiState
+import com.example.oftapp.viewmodel.PatientHistoryViewModel
+import com.example.oftapp.viewmodel.TipoEvento
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,6 +26,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.oftapp.ui.components.OftAppMedicoBottomBar
+import com.example.oftapp.ui.components.OftAppUnifiedTopBar
 import com.example.oftapp.ui.screens.pacientes.components.PatientSummaryCard
 import com.example.oftapp.ui.screens.pacientes.components.TimelineEndMarker
 import com.example.oftapp.ui.screens.pacientes.components.TimelineFilterBar
@@ -32,7 +41,10 @@ fun PatientHistoryScreen(
     pacienteId: Long,
     onBack: () -> Unit = {},
     onExamenClick: (Long) -> Unit = {},
-    onVerDocumento: (Long) -> Unit = {}
+    onVerDocumento: (Long) -> Unit = {},
+    onNavigateToDashboard: () -> Unit = onBack,
+    onNavigateToAtenciones: () -> Unit = onBack,
+    onNavigateToRegistro: () -> Unit = onBack
 ) {
     val viewModel: PatientHistoryViewModel = viewModel(
         factory = PatientHistoryViewModel.factory(pacienteId)
@@ -46,7 +58,10 @@ fun PatientHistoryScreen(
         onBuscar = { viewModel.onBuscar(it) },
         onReintentar = { viewModel.reintentar() },
         onExamenClick = onExamenClick,
-        onVerDocumento = onVerDocumento
+        onVerDocumento = onVerDocumento,
+        onNavigateToDashboard = onNavigateToDashboard,
+        onNavigateToAtenciones = onNavigateToAtenciones,
+        onNavigateToRegistro = onNavigateToRegistro
     )
 }
 
@@ -59,7 +74,10 @@ private fun PatientHistoryContent(
     onBuscar: (String) -> Unit = {},
     onReintentar: () -> Unit = {},
     onExamenClick: (Long) -> Unit = {},
-    onVerDocumento: (Long) -> Unit = {}
+    onVerDocumento: (Long) -> Unit = {},
+    onNavigateToDashboard: () -> Unit = {},
+    onNavigateToAtenciones: () -> Unit = {},
+    onNavigateToRegistro: () -> Unit = {}
 ) {
     var isSearchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf(uiState.consulta) }
@@ -108,35 +126,24 @@ private fun PatientHistoryContent(
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
                 )
             } else {
-                TopAppBar(
-                    title = {
-                        Column {
-                            Text(
-                                text = "Historial Clínico",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            val ficha = uiState.paciente?.codigoFicha ?: "Cargando..."
-                            Text(
-                                text = "Ficha $ficha",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { isSearchActive = true }) {
-                            Icon(Icons.Default.Search, contentDescription = "Buscar eventos")
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+                val ficha = uiState.paciente?.codigoFicha ?: "OFT-2024"
+                OftAppUnifiedTopBar(
+                    title = "Historial Clínico ($ficha)",
+                    badgeSubtitle = "OFTAPP CLINICAL",
+                    onBackClick = onBack,
+                    onSearchClick = { isSearchActive = true },
+                    showNotifications = false
                 )
             }
+        },
+        bottomBar = {
+            OftAppMedicoBottomBar(
+                selectedTab = "Historial",
+                onNavigateToDashboard = onNavigateToDashboard,
+                onNavigateToAtenciones = onNavigateToAtenciones,
+                onNavigateToRegistro = onNavigateToRegistro,
+                onNavigateToHistorial = { }
+            )
         },
         containerColor = ClinicalBackground
     ) { paddingValues ->

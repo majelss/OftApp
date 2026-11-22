@@ -3,13 +3,16 @@ package com.example.oftapp.data.repository
 import com.example.oftapp.data.model.EventoClinico
 import com.example.oftapp.data.model.Paciente
 import com.example.oftapp.data.model.TipoEventoClinico
+import com.example.oftapp.data.remote.OftAppApiService
+import com.example.oftapp.data.remote.RetrofitClient
 
 /**
- * Implementación en memoria del repositorio de historial.
- * Todos los datos son ficticios (app académica Duoc UC, DSY1105).
- * No diagnostica ni interpreta clínicamente.
+ * Implementación del repositorio de historial clínico con soporte de microservicio Spring Boot
+ * y fallback resiliente en memoria con datos sintéticos (DSY1105).
  */
-class HistorialRepositoryFake : HistorialRepository {
+class HistorialRepositoryFake(
+    private val api: OftAppApiService? = try { RetrofitClient.oftAppApi } catch (_: Exception) { null }
+) : HistorialRepository {
 
     private val pacientes = listOf(
         Paciente(
@@ -96,10 +99,54 @@ class HistorialRepositoryFake : HistorialRepository {
         )
     )
 
-    override suspend fun obtenerPaciente(id: Long): Paciente? =
-        pacientes.firstOrNull { it.id == id }
+    override suspend fun obtenerPaciente(id: Long): Paciente? {
+        return try {
+            val dto = api?.obtenerPacientePorId(id)
+            if (dto != null) {
+                Paciente(
+                    id = dto.id ?: id,
+                    nombre = dto.nombreCompleto,
+                    rut = dto.rut,
+                    edad = dto.edad,
+                    prevision = dto.prevision,
+                    activo = dto.activo,
+                    codigoFicha = dto.codigoFicha
+                )
+            } else {
+                pacientes.firstOrNull { it.id == id }
+            }
+        } catch (_: Exception) {
+            pacientes.firstOrNull { it.id == id }
+        }
+    }
 
-    override suspend fun obtenerEventos(pacienteId: Long): List<EventoClinico> =
-        eventos.filter { it.pacienteId == pacienteId }
+    override suspend fun obtenerEventos(pacienteId: Long): List<EventoClinico> {
+        val locales = eventos.filter { it.pacienteId == pacienteId }
             .sortedByDescending { it.fechaIso }
+        return try {
+            val remotos = api?.listarExamenes(rol = "MEDICO").orEmpty()
+            if (remotos.isNotEmpty()) {
+                val convertidos = remotos.mapIndexed { idx, ex ->
+                    EventoClinico(
+                        id = 100L + idx,
+                        pacienteId = pacienteId,
+                        fechaIso = "2026-10-24T10:30",
+                        titulo = ex.tipoExamen,
+                        subtitulo = "Ojo ${ex.ojoEvaluado} • ${ex.sucursalBox}",
+                        profesional = ex.firmaElectronica ?: "Dr. C. Mendoza",
+                        especialidad = "Oftalmología Clínica",
+                        estado = ex.estado,
+                        tipo = TipoEventoClinico.EXAMEN,
+                        tieneBotonAccion = true,
+                        textoBotonAccion = "Ver Informe Examen"
+                    )
+                }
+                (convertidos + locales).sortedByDescending { it.fechaIso }
+            } else {
+                locales
+            }
+        } catch (_: Exception) {
+            locales
+        }
+    }
 }

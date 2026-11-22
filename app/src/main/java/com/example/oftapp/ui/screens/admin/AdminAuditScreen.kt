@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.oftapp.data.local.AuditLogEntity
+import com.example.oftapp.viewmodel.AdminAuditViewModel
 
 private data class AuditFilterChip(
     val key: String,

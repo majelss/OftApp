@@ -1,5 +1,7 @@
 package com.example.oftapp.ui.screens.examenes
 
+import com.example.oftapp.viewmodel.ExamListViewModel
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -51,10 +53,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.oftapp.ui.components.FhirExternalReferenceCard
+import com.example.oftapp.ui.components.OfflineSyncStatusBanner
+import com.example.oftapp.ui.components.OftAppMedicoBottomBar
+import com.example.oftapp.ui.components.OftAppUnifiedFab
+import com.example.oftapp.ui.components.OftAppUnifiedTopBar
 import com.example.oftapp.ui.theme.OftAppAccentBlue
 import com.example.oftapp.ui.theme.OftAppBackground
 import com.example.oftapp.ui.theme.OftAppBorder
@@ -74,12 +84,13 @@ data class ItemAtencion(
     val ojo: String,
     val sucursal: String,
     val fecha: String,
-    val estado: String
+    val estado: String,
+    val pendienteSincronizacion: Boolean = false
 )
 
 /**
  * Pantalla de Consulta de Atenciones y Exámenes (RF02, RF07).
- * Incluye búsqueda por paciente/RUT, filtros por estado y navegación al detalle.
+ * Incluye búsqueda por paciente/RUT, filtros por estado, sincronización offline/online y API externa FHIR.
  */
 @Composable
 fun ExamListScreen(
@@ -94,6 +105,11 @@ fun ExamListScreen(
     var filtroEstado by remember { mutableStateOf("Todos") }
 
     val listaAtenciones by viewModel.atenciones.collectAsState(initial = emptyList())
+    val isOffline by viewModel.isOffline.collectAsState()
+    val pendientesCount by viewModel.pendientesCount.collectAsState()
+    val estadoSincronizacion by viewModel.estadoSincronizacion.collectAsState()
+    val reportesFhir by viewModel.reportesFhirExternos.collectAsState()
+    val estadoFhir by viewModel.estadoFhirExterno.collectAsState()
 
     val listaFiltrada = listaAtenciones.filter { item ->
         val matchesSearch = item.paciente.contains(searchQuery, ignoreCase = true) ||
@@ -107,86 +123,26 @@ fun ExamListScreen(
         modifier = modifier.fillMaxSize(),
         containerColor = OftAppBackground,
         topBar = {
-            Surface(color = Color.White, shadowElevation = 1.dp) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .statusBarsPadding()
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Visibility,
-                        contentDescription = null,
-                        tint = OftAppTealPrimary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Column {
-                        Text(
-                            text = "OFTAPP CLINICAL",
-                            fontSize = 10.5.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = OftAppTealPrimary,
-                            letterSpacing = 0.5.sp
-                        )
-                        Text(
-                            text = "Atenciones & Exámenes",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = OftAppTextPrimary
-                        )
-                    }
-                }
-            }
+            OftAppUnifiedTopBar(
+                title = "Atenciones & Exámenes",
+                badgeSubtitle = "OFTAPP CLINICAL",
+                onBackClick = onNavigateToDashboard
+            )
         },
         floatingActionButton = {
-            FloatingActionButton(
+            OftAppUnifiedFab(
                 onClick = onNavigateToRegistro,
-                containerColor = OftAppTealPrimary,
-                contentColor = Color.White,
-                shape = CircleShape
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Nuevo Examen")
-            }
+                contentDescription = "Nuevo Examen"
+            )
         },
         bottomBar = {
-            NavigationBar(containerColor = Color.White, tonalElevation = 6.dp) {
-                val items = listOf(
-                    Triple("Dashboard", Icons.Default.GridView, "Dashboard"),
-                    Triple("Atenciones", Icons.AutoMirrored.Filled.Assignment, "Atenciones"),
-                    Triple("Registro", Icons.Default.AddBox, "Registro"),
-                    Triple("Historial", Icons.Default.History, "Historial")
-                )
-                items.forEach { (nombre, icono, etiqueta) ->
-                    val isSelected = nombre == "Atenciones"
-                    NavigationBarItem(
-                        selected = isSelected,
-                        onClick = {
-                            when (nombre) {
-                                "Dashboard" -> onNavigateToDashboard()
-                                "Registro" -> onNavigateToRegistro()
-                                "Historial" -> onNavigateToHistorial()
-                            }
-                        },
-                        icon = { Icon(icono, contentDescription = etiqueta) },
-                        label = {
-                            Text(
-                                text = etiqueta,
-                                fontSize = 11.sp,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                            )
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = OftAppTealPrimary,
-                            selectedTextColor = OftAppTealPrimary,
-                            indicatorColor = OftAppNavIndicator,
-                            unselectedIconColor = OftAppTextMuted,
-                            unselectedTextColor = OftAppTextMuted
-                        )
-                    )
-                }
-            }
+            OftAppMedicoBottomBar(
+                selectedTab = "Atenciones",
+                onNavigateToDashboard = onNavigateToDashboard,
+                onNavigateToAtenciones = { },
+                onNavigateToRegistro = onNavigateToRegistro,
+                onNavigateToHistorial = onNavigateToHistorial
+            )
         }
     ) { innerPadding ->
         Column(
@@ -195,6 +151,17 @@ fun ExamListScreen(
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp, vertical = 10.dp)
         ) {
+            // Banner de estado Online / Modo Offline / Sincronización pendiente
+            OfflineSyncStatusBanner(
+                isOffline = isOffline,
+                pendientesCount = pendientesCount,
+                estadoSincronizacion = estadoSincronizacion,
+                onSincronizarClick = { viewModel.sincronizarAhora() },
+                onAlternarOfflineDemo = { viewModel.alternarModoOfflineDemo() }
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
             // Buscador
             OutlinedTextField(
                 value = searchQuery,
@@ -265,7 +232,10 @@ fun ExamListScreen(
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onNavigateToDetalle() },
+                            .clickable { onNavigateToDetalle() }
+                            .semantics {
+                                contentDescription = "Examen ${atencion.id} de ${atencion.paciente}, ${atencion.examen}, ojo ${atencion.ojo}, estado ${atencion.estado}"
+                            },
                         shape = RoundedCornerShape(14.dp),
                         color = Color.White,
                         border = BorderStroke(1.dp, OftAppBorder),
@@ -297,6 +267,22 @@ fun ExamListScreen(
                                             fontWeight = FontWeight.Bold,
                                             color = OftAppTealPrimary
                                         )
+                                    }
+                                    if (atencion.pendienteSincronizacion) {
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .background(Color(0xFFFEF3C7))
+                                                .padding(horizontal = 6.dp, vertical = 1.dp)
+                                        ) {
+                                            Text(
+                                                text = "Sincronización pendiente",
+                                                fontSize = 9.5.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = Color(0xFF92400E)
+                                            )
+                                        }
                                     }
                                 }
 
@@ -371,6 +357,16 @@ fun ExamListScreen(
                             }
                         }
                     }
+                }
+
+                // Tarjeta de integración con API REST Externa (HAPI FHIR R4)
+                item {
+                    FhirExternalReferenceCard(
+                        estadoFhir = estadoFhir,
+                        referencias = reportesFhir,
+                        onRecargarClick = { viewModel.recargarFhirExterno() },
+                        modifier = Modifier.padding(top = 4.dp, bottom = 72.dp)
+                    )
                 }
             }
         }

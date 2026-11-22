@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.oftapp.ui.screens.pacientes.FiltroTimeline
+import com.example.oftapp.viewmodel.FiltroTimeline
 import com.example.oftapp.ui.theme.ClinicalOnSurfaceVariant
 import com.example.oftapp.ui.theme.ClinicalPrimary
 

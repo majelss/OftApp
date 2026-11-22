@@ -18,9 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.oftapp.data.ExamRepository
+import com.example.oftapp.ui.components.OfflineSyncStatusBanner
+import com.example.oftapp.ui.components.OftAppPacienteBottomBar
+import com.example.oftapp.ui.components.OftAppUnifiedTopBar
+import kotlinx.coroutines.launch
 
 // Colores del diseño de la pantalla Mis Exámenes
 private val ScreenBg = Color(0xFFF2F6FC)
@@ -65,6 +71,12 @@ fun PacienteExamenes(
 ) {
     var busquedaText by remember { mutableStateOf("") }
     var filtroSeleccionado by remember { mutableStateOf("Todos (4)") }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val examRepo = remember { ExamRepository.getInstance(context) }
+    val isOffline by examRepo.isOffline.collectAsState()
+    val pendientesCount by examRepo.pendientesCount.collectAsState()
+    val estadoSincronizacion by examRepo.estadoSincronizacion.collectAsState()
 
     val listaFiltros = listOf("Todos (4)", "Campimetría", "Topografía corr")
 
@@ -125,92 +137,17 @@ fun PacienteExamenes(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            text = "OFTAPP CLÍNICA",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = BrandTealBlue,
-                            letterSpacing = 0.5.sp
-                        )
-                        Text(
-                            text = "Mis Exámenes",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = DarkTitleColor
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Notifications,
-                            contentDescription = "Notificaciones",
-                            tint = DarkTitleColor
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFB0BEC5)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "Perfil",
-                            tint = Color.White,
-                            modifier = Modifier.size(22.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(12.dp))
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = ScreenBg)
+            OftAppUnifiedTopBar(
+                title = "Mis Exámenes",
+                badgeSubtitle = "OFTAPP CLÍNICA",
+                onProfileClick = { onNavegarItemBottomBar("perfil") }
             )
         },
         bottomBar = {
-            NavigationBar(
-                containerColor = Color.White,
-                tonalElevation = 6.dp
-            ) {
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { onNavegarItemBottomBar("inicio") },
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") },
-                    label = { Text("Inicio", fontSize = 10.5.sp) }
-                )
-                NavigationBarItem(
-                    selected = true,
-                    onClick = { onNavegarItemBottomBar("examenes") },
-                    icon = { Icon(Icons.Default.Assignment, contentDescription = "Mis exámenes") },
-                    label = { Text("Mis exáme...", fontSize = 10.5.sp) },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = BrandTealBlue,
-                        selectedTextColor = BrandTealBlue,
-                        indicatorColor = ContainerLightBlue
-                    )
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { onNavegarItemBottomBar("historial") },
-                    icon = { Icon(Icons.Default.History, contentDescription = "Historial") },
-                    label = { Text("Historial", fontSize = 10.5.sp) }
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { onNavegarItemBottomBar("compartir") },
-                    icon = { Icon(Icons.Default.QrCode, contentDescription = "Compartir") },
-                    label = { Text("Compartir", fontSize = 10.5.sp) }
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { onNavegarItemBottomBar("perfil") },
-                    icon = { Icon(Icons.Default.PersonOutline, contentDescription = "Perfil") },
-                    label = { Text("Perfil", fontSize = 10.5.sp) }
-                )
-            }
+            OftAppPacienteBottomBar(
+                selectedTab = "examenes",
+                onNavegarItemBottomBar = onNavegarItemBottomBar
+            )
         },
         containerColor = ScreenBg
     ) { innerPadding ->
@@ -274,6 +211,18 @@ fun PacienteExamenes(
                 fontSize = 12.5.sp,
                 color = Color.Gray,
                 lineHeight = 16.sp
+            )
+
+            OfflineSyncStatusBanner(
+                isOffline = isOffline,
+                pendientesCount = pendientesCount,
+                estadoSincronizacion = estadoSincronizacion,
+                onSincronizarClick = {
+                    scope.launch { examRepo.sincronizarPendientes(rol = "PACIENTE") }
+                },
+                onAlternarOfflineDemo = {
+                    scope.launch { examRepo.alternarModoOfflineDemo() }
+                }
             )
 
             // --- BARRA DE BÚSQUEDA ---

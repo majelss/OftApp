@@ -6,6 +6,8 @@ import com.example.oftapp.data.local.AuditLogEntity
 import com.example.oftapp.data.local.OftAppDatabase
 import com.example.oftapp.data.local.SystemConfigEntity
 import com.example.oftapp.data.local.UsuarioAdminEntity
+import com.example.oftapp.data.remote.OftAppApiService
+import com.example.oftapp.data.remote.RetrofitClient
 import kotlinx.coroutines.flow.Flow
 import java.security.MessageDigest
 import java.text.SimpleDateFormat
@@ -29,11 +31,32 @@ data class SucursalClinica(
  * Repositorio del módulo Administrador (Usuarios, Auditoría Criptográfica y Configuración Global).
  * Conecta los ViewModels de Administración con Room (SQLite) y registra trazabilidad automática.
  */
-class AdminRepository(private val adminDao: AdminDao) {
+class AdminRepository(
+    private val adminDao: AdminDao,
+    private val api: OftAppApiService = RetrofitClient.oftAppApi
+) {
 
     val usuariosFlow: Flow<List<UsuarioAdminEntity>> = adminDao.observarUsuarios()
     val auditLogsFlow: Flow<List<AuditLogEntity>> = adminDao.observarAuditLogs()
     val systemConfigFlow: Flow<SystemConfigEntity?> = adminDao.observarSystemConfig()
+
+    /**
+     * Sincroniza usuarios y bitácora de auditoría desde el microservicio Spring Boot hacia Room.
+     * Si el backend está desconectado, conserva intactos los registros locales de Room.
+     */
+    suspend fun sincronizarConBackend(): Boolean {
+        return try {
+            val usuariosRemotos = api.listarUsuariosAdmin()
+            usuariosRemotos.forEach { adminDao.guardarUsuario(it) }
+            val logsRemotos = api.listarAuditoria()
+            if (logsRemotos.isNotEmpty()) {
+                adminDao.insertarAuditLogs(logsRemotos)
+            }
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
 
     suspend fun obtenerUsuarioPorId(id: String): UsuarioAdminEntity? {
         return adminDao.obtenerUsuarioPorId(id)
@@ -50,6 +73,11 @@ class AdminRepository(private val adminDao: AdminDao) {
      */
     suspend fun guardarUsuario(usuario: UsuarioAdminEntity, esNuevo: Boolean) {
         adminDao.guardarUsuario(usuario)
+        try {
+            api.guardarUsuarioAdmin(usuario = usuario)
+        } catch (_: Exception) {
+            // Resiliencia offline: el usuario ya quedó persistido en Room SQLite
+        }
 
         val rolLegible = when (usuario.rol) {
             "medico" -> "Médico Oftalmólogo (${usuario.especialidad})"
@@ -236,6 +264,11 @@ class AdminRepository(private val adminDao: AdminDao) {
             timestampMillis = ahora
         )
         adminDao.insertarAuditLog(log)
+        try {
+            api.registrarAuditoria(log)
+        } catch (_: Exception) {
+            // Resiliencia offline: el evento forense ya quedó persistido en Room SQLite
+        }
     }
 
     private fun calcularSha256(input: String): String {

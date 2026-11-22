@@ -24,6 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.oftapp.ui.components.OftAppPacienteBottomBar
+import com.example.oftapp.ui.components.OftAppUnifiedTopBar
 
 // Colores del diseño de Perfil
 private val ScreenBg = Color(0xFFF2F6FC)
@@ -52,92 +54,17 @@ fun PacientePerfilScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            text = "OFTAPP CLÍNICA",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = BrandTealBlue,
-                            letterSpacing = 0.5.sp
-                        )
-                        Text(
-                            text = "Perfil",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = DarkTitleColor
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Notifications,
-                            contentDescription = "Notificaciones",
-                            tint = DarkTitleColor
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFB0BEC5)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "Perfil",
-                            tint = Color.White,
-                            modifier = Modifier.size(22.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(12.dp))
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = ScreenBg)
+            OftAppUnifiedTopBar(
+                title = "Perfil",
+                badgeSubtitle = "OFTAPP CLÍNICA",
+                onLogoutClick = onCerrarSesion
             )
         },
         bottomBar = {
-            NavigationBar(
-                containerColor = Color.White,
-                tonalElevation = 6.dp
-            ) {
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { onNavegarItemBottomBar("inicio") },
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") },
-                    label = { Text("Inicio", fontSize = 10.5.sp) }
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { onNavegarItemBottomBar("examenes") },
-                    icon = { Icon(Icons.Default.Assignment, contentDescription = "Mis exámenes") },
-                    label = { Text("Mis exáme...", fontSize = 10.5.sp) }
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { onNavegarItemBottomBar("historial") },
-                    icon = { Icon(Icons.Default.History, contentDescription = "Historial") },
-                    label = { Text("Historial", fontSize = 10.5.sp) }
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { onNavegarItemBottomBar("compartir") },
-                    icon = { Icon(Icons.Default.QrCode, contentDescription = "Compartir") },
-                    label = { Text("Compartir", fontSize = 10.5.sp) }
-                )
-                NavigationBarItem(
-                    selected = true,
-                    onClick = { onNavegarItemBottomBar("perfil") },
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Perfil") },
-                    label = { Text("Perfil", fontSize = 10.5.sp) },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = BrandTealBlue,
-                        selectedTextColor = BrandTealBlue,
-                        indicatorColor = ContainerLightBlue
-                    )
-                )
-            }
+            OftAppPacienteBottomBar(
+                selectedTab = "perfil",
+                onNavegarItemBottomBar = onNavegarItemBottomBar
+            )
         },
         containerColor = ScreenBg
     ) { innerPadding ->

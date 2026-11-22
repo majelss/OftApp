@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 /**
  * Entidad Room que persiste un examen oftalmológico en SQLite.
- * Mapea el modelo de dominio ExamenOftalmologico para almacenamiento local persistente.
+ * Incluye el indicador pendienteSincronizacion para resiliencia offline/online con Spring Boot.
  * (DSY1105 - OftApp)
  */
 @Entity(tableName = "examenes")
@@ -25,5 +25,6 @@ data class ExamenEntity(
     val observaciones: String,
     val estado: String,
     val fecha: String,
-    val firmaElectronica: String
+    val firmaElectronica: String,
+    val pendienteSincronizacion: Boolean = false
 )

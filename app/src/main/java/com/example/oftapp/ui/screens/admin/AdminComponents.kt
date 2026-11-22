@@ -84,7 +84,8 @@ enum class AdminTab(val label: String, val icon: ImageVector) {
 }
 
 /**
- * Barra de navegación inferior persistente exclusiva del módulo Administrador (4 destinos).
+ * Barra de navegación inferior persistente exclusiva del módulo Administrador (4 destinos),
+ * unificada con el estilo Material 3 NavigationBar de toda la aplicación.
  */
 @Composable
 fun AdminBottomNavBar(
@@ -98,56 +99,39 @@ fun AdminBottomNavBar(
         shadowElevation = 8.dp,
         border = BorderStroke(1.dp, ClinicalClarityColors.CardBorder)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .navigationBarsPadding()
-                .height(68.dp)
-                .padding(horizontal = 4.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
+        NavigationBar(
+            containerColor = ClinicalClarityColors.SurfaceLowest,
+            tonalElevation = 0.dp
         ) {
             AdminTab.entries.forEach { tab ->
                 val isSelected = tab == selectedTab
-                val contentColor = if (isSelected) ClinicalClarityColors.Primary else ClinicalClarityColors.OnSurfaceVariant
-
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .clip(RoundedCornerShape(12.dp))
-                        .clickable { onSelectTab(tab) }
-                        .padding(vertical = 6.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .width(48.dp)
-                            .height(28.dp)
-                            .clip(RoundedCornerShape(50))
-                            .background(
-                                if (isSelected) ClinicalClarityColors.SurfaceHigh else Color.Transparent
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
+                NavigationBarItem(
+                    selected = isSelected,
+                    onClick = { onSelectTab(tab) },
+                    icon = {
                         Icon(
                             imageVector = tab.icon,
                             contentDescription = tab.label,
-                            tint = contentColor,
                             modifier = Modifier.size(22.dp)
                         )
-                    }
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = tab.label,
-                        fontSize = 11.5.sp,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                        color = contentColor,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                    },
+                    label = {
+                        Text(
+                            text = tab.label,
+                            fontSize = 11.5.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = ClinicalClarityColors.Primary,
+                        selectedTextColor = ClinicalClarityColors.Primary,
+                        indicatorColor = ClinicalClarityColors.SurfaceHigh,
+                        unselectedIconColor = ClinicalClarityColors.OnSurfaceVariant,
+                        unselectedTextColor = ClinicalClarityColors.OnSurfaceVariant
                     )
-                }
+                )
             }
         }
     }
@@ -230,7 +214,7 @@ fun AdminModuleHeader(
                 if (onSearchClick != null) {
                     IconButton(
                         onClick = onSearchClick,
-                        modifier = Modifier.size(48.dp)
+                        modifier = Modifier.size(40.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -240,48 +224,29 @@ fun AdminModuleHeader(
                     }
                 }
                 Spacer(modifier = Modifier.width(4.dp))
-                var menuPerfilExpandido by remember { mutableStateOf(false) }
-                Box {
-                    Box(
-                        modifier = Modifier
-                            .size(34.dp)
-                            .clip(CircleShape)
-                            .background(ClinicalClarityColors.Primary)
-                            .clickable {
-                                if (onProfileClick != null) onProfileClick() else menuPerfilExpandido = true
-                            },
-                        contentAlignment = Alignment.Center
+                // Botón visible de Cerrar Sesión / Salir en pantallas de Administrador
+                Surface(
+                    onClick = onBackClick,
+                    shape = RoundedCornerShape(50),
+                    color = ClinicalClarityColors.ErrorContainer,
+                    border = BorderStroke(1.dp, ClinicalClarityColors.Error.copy(alpha = 0.4f))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "Perfil Admin",
-                            tint = ClinicalClarityColors.OnPrimary,
-                            modifier = Modifier.size(18.dp)
+                            imageVector = Icons.AutoMirrored.Filled.Logout,
+                            contentDescription = "Cerrar Sesión",
+                            tint = ClinicalClarityColors.Error,
+                            modifier = Modifier.size(16.dp)
                         )
-                    }
-                    DropdownMenu(
-                        expanded = menuPerfilExpandido,
-                        onDismissRequest = { menuPerfilExpandido = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    "Cerrar Sesión Admin",
-                                    color = ClinicalClarityColors.Error,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.Logout,
-                                    contentDescription = null,
-                                    tint = ClinicalClarityColors.Error
-                                )
-                            },
-                            onClick = {
-                                menuPerfilExpandido = false
-                                onBackClick()
-                            }
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "Salir",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ClinicalClarityColors.Error
                         )
                     }
                 }

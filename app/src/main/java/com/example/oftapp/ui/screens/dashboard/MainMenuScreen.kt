@@ -24,8 +24,27 @@ val BadgeBg = Color(0xFFB3E5FC)
 
 @Composable
 fun MainMenuScreen(
+    rolActivo: String = "MEDICO",
     onNavigateTo: (String) -> Unit = {}
 ) {
+    val (nombreProfesional, cargoProfesional, turnoLabel) = when (rolActivo.uppercase()) {
+        "TECNICO" -> Triple(
+            "T.M. Lucas Morales",
+            "Tecnólogo Médico en Oftalmología • Reg. #58210",
+            "En Turno — Sala de Exámenes OCT / Campimetría"
+        )
+        "ADMINISTRATIVO" -> Triple(
+            "Claudia Vidal",
+            "Administrativo Clínico & Admisión • Sede Central",
+            "En Turno — Recepción y Gestión de Fichas"
+        )
+        else -> Triple(
+            "Dr. Carlos Morales",
+            "Médico Oftalmólogo • Reg. Med. #44921",
+            "En Turno — Box 4 Central"
+        )
+    }
+
     Scaffold(
         containerColor = Color.White
     ) { innerPadding ->
@@ -36,7 +55,7 @@ fun MainMenuScreen(
                 .navigationBarsPadding()
                 .background(Color.White)
         ) {
-            // Header del Médico (Azul Oscuro)
+            // Header del Personal Clínico (Azul Oscuro)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -45,7 +64,7 @@ fun MainMenuScreen(
                     .padding(20.dp)
             ) {
                 Column {
-                    // Avatar del Médico
+                    // Avatar
                     Box(
                         modifier = Modifier
                             .size(64.dp)
@@ -53,7 +72,7 @@ fun MainMenuScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Person,
-                            contentDescription = "Foto Doctor",
+                            contentDescription = "Foto Personal",
                             tint = Color.White,
                             modifier = Modifier
                                 .fillMaxSize()
@@ -64,14 +83,14 @@ fun MainMenuScreen(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
-                        text = "Dr. Carlos Morales",
+                        text = nombreProfesional,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
 
                     Text(
-                        text = "Médico Oftalmólogo • Reg. Med. #44921",
+                        text = cargoProfesional,
                         fontSize = 12.sp,
                         color = Color.White.copy(alpha = 0.8f)
                     )
@@ -94,7 +113,7 @@ fun MainMenuScreen(
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = "En Turno — Box 4 Central",
+                                text = turnoLabel,
                                 fontSize = 12.sp,
                                 color = Color.White,
                                 fontWeight = FontWeight.Medium

@@ -1,5 +1,9 @@
 package com.example.oftapp.ui.screens.dashboard
 
+import com.example.oftapp.viewmodel.AtencionResumen
+import com.example.oftapp.viewmodel.DashboardViewModel
+import com.example.oftapp.viewmodel.EstadisticaDashboard
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -31,6 +35,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -41,11 +47,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.oftapp.data.ExamRepository
+import com.example.oftapp.ui.components.FhirExternalReferenceCard
+import com.example.oftapp.ui.components.OfflineSyncStatusBanner
+import com.example.oftapp.ui.components.OftAppMedicoBottomBar
+import com.example.oftapp.ui.components.OftAppUnifiedFab
+import com.example.oftapp.ui.components.OftAppUnifiedTopBar
 import com.example.oftapp.ui.components.TarjetaEstadistica
 import kotlinx.coroutines.launch
 
@@ -54,10 +67,23 @@ fun DashboardScreen(
     modelo: DashboardViewModel = viewModel(),
     onNavegar: (String) -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val examRepo = remember { ExamRepository.getInstance(context) }
+    val isOffline by examRepo.isOffline.collectAsState()
+    val pendientesCount by examRepo.pendientesCount.collectAsState()
+    val estadoSincronizacion by examRepo.estadoSincronizacion.collectAsState()
+    val reportesFhir by examRepo.reportesFhirExternos.collectAsState()
+    val estadoFhir by examRepo.estadoFhirExterno.collectAsState()
+
     val estadoMenu = rememberDrawerState(
         initialValue = DrawerValue.Closed
     )
     val alcanceCorrutina = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        examRepo.refrescarDesdeBackend()
+        examRepo.cargarReferenciasFhirExternas()
+    }
 
     var pestanaSeleccionada by remember {
         mutableIntStateOf(0)
@@ -89,37 +115,29 @@ fun DashboardScreen(
     ) {
         Scaffold(
             containerColor = Color(0xFFF5F8FD),
+            topBar = {
+                OftAppUnifiedTopBar(
+                    title = "Dashboard Clínico",
+                    badgeSubtitle = "OFTAPP CLINICAL",
+                    onMenuClick = {
+                        alcanceCorrutina.launch { estadoMenu.open() }
+                    },
+                    onLogoutClick = { onNavegar("login") }
+                )
+            },
             bottomBar = {
-                BarraInferiorDashboard(
-                    seleccionada = pestanaSeleccionada,
-                    onSeleccionar = { indice ->
-                        pestanaSeleccionada = indice
-                        if (indice != 0) {
-                            val destino = when (indice) {
-                                1 -> "Lista de Atenciones"
-                                2 -> "Registrar Examen"
-                                else -> "Historial Clínico"
-                            }
-                            onNavegar(destino)
-                        }
-                    }
+                OftAppMedicoBottomBar(
+                    selectedTab = "Dashboard",
+                    onNavigateToDashboard = { },
+                    onNavigateToAtenciones = { onNavegar("Lista de Atenciones") },
+                    onNavigateToRegistro = { onNavegar("Registrar Examen") },
+                    onNavigateToHistorial = { onNavegar("Historial Clínico") }
                 )
             },
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = {
-                        onNavegar("Registrar Examen")
-                    },
-                    containerColor = Color(0xFF087E9B),
-                    contentColor = Color.White,
-                    shape = RoundedCornerShape(18.dp)
-                ) {
-                    Text(
-                        text = "+",
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Light
-                    )
-                }
+                OftAppUnifiedFab(
+                    onClick = { onNavegar("Registrar Examen") }
+                )
             }
         ) { espacioInterno ->
             LazyColumn(
@@ -135,17 +153,31 @@ fun DashboardScreen(
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 item {
-                    EncabezadoDashboard(
-                        alAbrirMenu = {
-                            alcanceCorrutina.launch {
-                                estadoMenu.open()
-                            }
+                    TarjetaBienvenida()
+                }
+
+                item {
+                    OfflineSyncStatusBanner(
+                        isOffline = isOffline,
+                        pendientesCount = pendientesCount,
+                        estadoSincronizacion = estadoSincronizacion,
+                        onSincronizarClick = {
+                            alcanceCorrutina.launch { examRepo.sincronizarPendientes() }
+                        },
+                        onAlternarOfflineDemo = {
+                            alcanceCorrutina.launch { examRepo.alternarModoOfflineDemo() }
                         }
                     )
                 }
 
                 item {
-                    TarjetaBienvenida()
+                    FhirExternalReferenceCard(
+                        estadoFhir = estadoFhir,
+                        referencias = reportesFhir,
+                        onRecargarClick = {
+                            alcanceCorrutina.launch { examRepo.cargarReferenciasFhirExternas() }
+                        }
+                    )
                 }
 
                 item {
