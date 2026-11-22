@@ -1,5 +1,8 @@
 package com.example.oftapp.ui.screens.examenes
 
+import com.example.oftapp.viewmodel.ExamDetailUiState
+import com.example.oftapp.viewmodel.ExamDetailViewModel
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -86,6 +89,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.oftapp.model.ExamenVisualDetalle
+import com.example.oftapp.ui.components.CoilRetinaZoomCard
+import com.example.oftapp.ui.components.OftAppUnifiedTopBar
+import com.example.oftapp.ui.components.PdfViewerDialog
 import com.example.oftapp.ui.theme.OftAppAccentBlue
 import com.example.oftapp.ui.theme.OftAppBackground
 import com.example.oftapp.ui.theme.OftAppBorder
@@ -114,6 +120,19 @@ fun ExamDetailScreen(
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     var showMenuOverflow by remember { mutableStateOf(false) }
+    var showPdfViewerDialog by remember { mutableStateOf(false) }
+
+    if (showPdfViewerDialog) {
+        PdfViewerDialog(
+            idExamen = uiState.examen.idExamen,
+            pacienteNombre = uiState.examen.paciente.nombreCompleto,
+            pacienteRut = uiState.examen.paciente.rut,
+            tipoExamen = uiState.examen.tipoExamen,
+            observaciones = uiState.examen.observaciones,
+            medicoValidador = uiState.examen.validadorNombre,
+            onDismiss = { showPdfViewerDialog = false }
+        )
+    }
 
     LaunchedEffect(uiState.snackbarMessage) {
         uiState.snackbarMessage?.let {
@@ -215,9 +234,10 @@ fun ExamDetailScreen(
         containerColor = OftAppBackground,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            ExamDetailTopAppBar(
-                onBackClick = onNavigateBack,
-                onProfileClick = {}
+            OftAppUnifiedTopBar(
+                title = "Examen Visual",
+                badgeSubtitle = "OFTAPP CLINICAL",
+                onBackClick = onNavigateBack
             )
         }
     ) { innerPadding ->
@@ -274,6 +294,11 @@ fun ExamDetailScreen(
 
                 Spacer(modifier = Modifier.height(14.dp))
 
+                // Visor de Imágenes Clínicas con Coil & Gesto de Zoom Táctil
+                CoilRetinaZoomCard()
+
+                Spacer(modifier = Modifier.height(14.dp))
+
                 // Galería de Imágenes Diagnósticas (Fondo OD y OCT)
                 DiagnosticImagesGallery(
                     onImageClick = { desc ->
@@ -283,9 +308,12 @@ fun ExamDetailScreen(
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                // Botones rápidos: PDF, DICOM, Histórico
+                // Botones rápidos: PDF (abre PdfRenderer), DICOM, Histórico
                 QuickActionPills(
-                    onPdfClick = { viewModel.onExportPdf() },
+                    onPdfClick = {
+                        showPdfViewerDialog = true
+                        viewModel.onExportPdf()
+                    },
                     onDicomClick = { viewModel.onExportDicom() },
                     onHistoricoClick = { viewModel.onOpenHistorico() }
                 )

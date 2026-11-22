@@ -1,4 +1,4 @@
-package com.example.oftapp.ui.screens.dashboard
+package com.example.oftapp.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,7 +19,6 @@ data class AtencionResumen(
     val examen: String,
     val estado: String
 )
-//Datos referenciales a las imagenes de la app
 
 class DashboardViewModel : ViewModel() {
 

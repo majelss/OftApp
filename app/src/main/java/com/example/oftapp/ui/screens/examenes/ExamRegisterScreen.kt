@@ -1,5 +1,8 @@
 package com.example.oftapp.ui.screens.examenes
 
+import com.example.oftapp.viewmodel.ExamRegisterUiState
+import com.example.oftapp.viewmodel.ExamRegisterViewModel
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -80,6 +83,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.oftapp.model.DocumentoAdjunto
 import com.example.oftapp.model.OjoEvaluado
+import com.example.oftapp.ui.components.OftAppMedicoBottomBar
+import com.example.oftapp.ui.components.OftAppUnifiedTopBar
 import com.example.oftapp.ui.theme.OftAppAccentBlue
 import com.example.oftapp.ui.theme.OftAppBackground
 import com.example.oftapp.ui.theme.OftAppBorder
@@ -194,22 +199,19 @@ fun ExamRegisterScreen(
         containerColor = OftAppBackground,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            TopAppBarContent(
-                onNotificationClick = {},
-                onProfileClick = {}
+            OftAppUnifiedTopBar(
+                title = "Registrar Examen",
+                badgeSubtitle = "OFTAPP CLINICAL",
+                onBackClick = onNavigateBack
             )
         },
         bottomBar = {
-            OftAppBottomNavigationBar(
+            OftAppMedicoBottomBar(
                 selectedTab = "Registro",
-                onTabSelected = { tab ->
-                    when (tab) {
-                        "Dashboard" -> onNavigateToDashboard()
-                        "Atenciones" -> onNavigateToAtenciones()
-                        "Registro" -> { /* Ya en registro */ }
-                        "Historial" -> onNavigateToHistorial()
-                    }
-                }
+                onNavigateToDashboard = onNavigateToDashboard,
+                onNavigateToAtenciones = onNavigateToAtenciones,
+                onNavigateToRegistro = { },
+                onNavigateToHistorial = onNavigateToHistorial
             )
         }
     ) { innerPadding ->

@@ -1,4 +1,4 @@
-package com.example.oftapp.ui.screens.pacientes
+package com.example.oftapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

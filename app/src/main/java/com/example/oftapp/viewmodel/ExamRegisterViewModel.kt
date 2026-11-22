@@ -1,4 +1,4 @@
-package com.example.oftapp.ui.screens.examenes
+package com.example.oftapp.viewmodel
 
 import android.app.Application
 import android.content.Context
@@ -41,12 +41,11 @@ data class ExamRegisterUiState(
     val mensajeError: String? = null
 )
 
-class ExamRegisterViewModel(
-    application: Application
-) : AndroidViewModel(application) {
-
+class ExamRegisterViewModel @JvmOverloads constructor(
+    application: Application,
     private val repository: ExamRepository =
         ExamRepository.getInstance(application.applicationContext)
+) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(ExamRegisterUiState())
     val uiState: StateFlow<ExamRegisterUiState> = _uiState.asStateFlow()

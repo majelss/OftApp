@@ -31,6 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.oftapp.ui.components.CoilRetinaZoomCard
+import com.example.oftapp.ui.components.OftAppUnifiedTopBar
+import com.example.oftapp.ui.components.PdfViewerDialog
 
 // Modelos locales para que la pantalla sea autosuficiente sin depender del ViewModel médico
 data class PacienteInfo(
@@ -71,6 +74,19 @@ fun PacienteExamDetailScreen(
     var zoomPercentage by remember { mutableStateOf(100) }
     var isFullscreenMap by remember { mutableStateOf(false) }
     var showMenuOverflow by remember { mutableStateOf(false) }
+    var showPdfViewerDialog by remember { mutableStateOf(false) }
+
+    if (showPdfViewerDialog) {
+        PdfViewerDialog(
+            idExamen = examen.idExamen,
+            pacienteNombre = examen.paciente.nombreCompleto,
+            pacienteRut = examen.paciente.rut,
+            tipoExamen = examen.tipoExamen,
+            observaciones = examen.observaciones,
+            medicoValidador = examen.validadorNombre,
+            onDismiss = { showPdfViewerDialog = false }
+        )
+    }
 
     // Modal a pantalla completa para el mapa visual
     if (isFullscreenMap) {
@@ -121,9 +137,10 @@ fun PacienteExamDetailScreen(
         modifier = modifier.fillMaxSize(),
         containerColor = Color(0xFFF2F6FC),
         topBar = {
-            ExamDetailTopAppBar(
-                onBackClick = onNavigateBack,
-                onProfileClick = {}
+            OftAppUnifiedTopBar(
+                title = "Examen Visual",
+                badgeSubtitle = "OFTAPP CLÍNICA",
+                onBackClick = onNavigateBack
             )
         }
     ) { innerPadding ->
@@ -176,17 +193,22 @@ fun PacienteExamDetailScreen(
 
                 Spacer(modifier = Modifier.height(14.dp))
 
+                // Visor de Imagen Clínica con Coil y Zoom Táctil
+                CoilRetinaZoomCard()
+
+                Spacer(modifier = Modifier.height(14.dp))
+
                 // Galería de Imágenes Diagnósticas
                 DiagnosticImagesGallery(
-                    onImageClick = { }
+                    onImageClick = { showPdfViewerDialog = true }
                 )
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                // Botones rápidos: PDF, DICOM, Histórico
+                // Botones rápidos: PDF (abre PdfRenderer), DICOM, Histórico
                 QuickActionPills(
-                    onPdfClick = { },
-                    onDicomClick = { },
+                    onPdfClick = { showPdfViewerDialog = true },
+                    onDicomClick = { showPdfViewerDialog = true },
                     onHistoricoClick = { }
                 )
 

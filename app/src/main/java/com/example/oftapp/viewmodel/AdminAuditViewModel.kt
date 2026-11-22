@@ -1,4 +1,4 @@
-package com.example.oftapp.ui.screens.admin
+package com.example.oftapp.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -36,6 +36,9 @@ class AdminAuditViewModel(
     val uiState: StateFlow<AdminAuditUiState> = _uiState.asStateFlow()
 
     init {
+        viewModelScope.launch {
+            repository.sincronizarConBackend()
+        }
         viewModelScope.launch {
             repository.auditLogsFlow.collect { lista ->
                 _uiState.update { state ->

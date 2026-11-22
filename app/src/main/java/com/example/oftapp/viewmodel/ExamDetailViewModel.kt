@@ -1,11 +1,14 @@
-package com.example.oftapp.ui.screens.examenes
+package com.example.oftapp.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.oftapp.data.ExamRepository
 import com.example.oftapp.model.ExamenVisualDetalle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class ExamDetailUiState(
     val examen: ExamenVisualDetalle = ExamenVisualDetalle(),
@@ -16,7 +19,9 @@ data class ExamDetailUiState(
     val snackbarMessage: String? = null
 )
 
-class ExamDetailViewModel : ViewModel() {
+class ExamDetailViewModel @JvmOverloads constructor(
+    private val repository: ExamRepository? = null
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ExamDetailUiState())
     val uiState: StateFlow<ExamDetailUiState> = _uiState.asStateFlow()
@@ -71,6 +76,13 @@ class ExamDetailViewModel : ViewModel() {
                 examen = it.examen.copy(estado = nuevoEstado),
                 showActualizarEstadoDialog = false,
                 snackbarMessage = "Estado actualizado a: $nuevoEstado con firma electrónica"
+            )
+        }
+        viewModelScope.launch {
+            repository?.actualizarEstadoExamen(
+                id = "EXAM-2026-001",
+                nuevoEstado = nuevoEstado,
+                firma = _uiState.value.examen.validadorNombre
             )
         }
     }

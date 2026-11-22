@@ -1,4 +1,4 @@
-package com.example.oftapp.ui.screens.admin
+package com.example.oftapp.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.ViewModel

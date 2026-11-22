@@ -1,15 +1,20 @@
 package com.example.oftapp.navigation
 
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.oftapp.PlaceholderScreen
+import com.example.oftapp.data.local.SessionTokenManager
 import com.example.oftapp.model.EstadoSesion
+import com.example.oftapp.model.SesionActual
 import com.example.oftapp.model.esAdmin
 import com.example.oftapp.model.esPaciente
+import com.example.oftapp.model.esTecnico
+import com.example.oftapp.ui.components.LocalLogoutAction
 import com.example.oftapp.ui.screens.admin.AdminAuditScreen
 import com.example.oftapp.ui.screens.admin.AdminSystemConfigScreen
 import com.example.oftapp.ui.screens.admin.AdminTab
@@ -26,6 +31,7 @@ import com.example.oftapp.ui.screens.pacientes.PacienteExamenes
 import com.example.oftapp.ui.screens.pacientes.PacienteHomeScreen
 import com.example.oftapp.ui.screens.pacientes.PacientePerfilScreen
 import com.example.oftapp.ui.screens.pacientes.PatientHistoryScreen
+import com.example.oftapp.ui.screens.tm.TmMainScaffold
 
 /**
  * Rutas canónicas del sistema OftApp.
@@ -48,6 +54,9 @@ object Rutas {
     const val HISTORIAL = "historial"
     const val DETALLE_EXAMEN = "detalle_examen"
     const val PATOLOGIAS = "patologias"
+
+    // Rutas exclusivas del rol Tecnólogo Médico
+    const val TM_MAIN = "tm_main"
 
     // Rutas exclusivas del rol Administrador ("Clinical Clarity")
     const val ADMIN_USUARIOS = "admin_usuarios"
@@ -86,6 +95,7 @@ private fun resolverRuta(destino: String, estadoSesion: EstadoSesion): String {
                 else -> Rutas.ADMIN_USUARIOS
             }
         }
+        estadoSesion.esTecnico() -> Rutas.TM_MAIN
         else -> {
             when {
                 "historial" in d -> Rutas.historialMedico()
@@ -104,11 +114,15 @@ private fun resolverRuta(destino: String, estadoSesion: EstadoSesion): String {
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+    val context = LocalContext.current
+    val tokenManager = remember { SessionTokenManager.getInstance(context) }
 
     // Estado global de la sesión del usuario
     var estadoSesion by remember { mutableStateOf(EstadoSesion()) }
 
     val cerrarSesionGlobal: () -> Unit = {
+        tokenManager.limpiarSesion()
+        SesionActual.cerrarSesion()
         estadoSesion = EstadoSesion(
             usuarioId = null,
             rol = null,
@@ -141,6 +155,7 @@ fun AppNavigation() {
         }
     }
 
+    CompositionLocalProvider(LocalLogoutAction provides cerrarSesionGlobal) {
     NavHost(
         navController = navController,
         startDestination = Rutas.LOGIN
@@ -157,6 +172,7 @@ fun AppNavigation() {
 
                     val rutaInicio = when {
                         estadoSesion.esPaciente() -> Rutas.PACIENTE_HOME
+                        estadoSesion.esTecnico() -> Rutas.TM_MAIN
                         estadoSesion.esAdmin() -> Rutas.ADMIN_USUARIOS
                         else -> Rutas.MAIN_MENU
                     }
@@ -308,10 +324,28 @@ fun AppNavigation() {
             }
         }
 
-        // --- 3. FLUJO DEL PERSONAL MÉDICO (AISLADO) ---
+        // --- 2.5 FLUJO EXCLUSIVO DEL ROL TECNÓLOGO MÉDICO (AISLADO) ---
+        composable(Rutas.TM_MAIN) {
+            if (estadoSesion.estaAutenticado && estadoSesion.esTecnico()) {
+                TmMainScaffold(
+                    onLogoutToLogin = cerrarSesionGlobal
+                )
+            } else {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Rutas.LOGIN) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            }
+        }
+
+        // --- 3. FLUJO DEL PERSONAL MÉDICO OFTALMÓLOGO (AISLADO) ---
         composable(Rutas.MAIN_MENU) {
-            if (estadoSesion.estaAutenticado && !estadoSesion.esPaciente() && !estadoSesion.esAdmin()) {
-                MainMenuScreen(onNavigateTo = navegar)
+            if (estadoSesion.estaAutenticado && !estadoSesion.esPaciente() && !estadoSesion.esAdmin() && !estadoSesion.esTecnico()) {
+                MainMenuScreen(
+                    rolActivo = estadoSesion.rol ?: "MEDICO",
+                    onNavigateTo = navegar
+                )
             } else {
                 LaunchedEffect(Unit) {
                     navController.navigate(Rutas.LOGIN) {
@@ -380,7 +414,10 @@ fun AppNavigation() {
                     pacienteId = pacienteId,
                     onBack = { navController.popBackStack() },
                     onExamenClick = { navController.navigate(Rutas.DETALLE_EXAMEN) },
-                    onVerDocumento = { navController.navigate(Rutas.DETALLE_EXAMEN) }
+                    onVerDocumento = { navController.navigate(Rutas.DETALLE_EXAMEN) },
+                    onNavigateToDashboard = { navController.navigate(Rutas.DASHBOARD) },
+                    onNavigateToAtenciones = { navController.navigate(Rutas.LISTA_ATENCIONES) },
+                    onNavigateToRegistro = { navController.navigate(Rutas.REGISTRAR_EXAMEN) }
                 )
             } else {
                 LaunchedEffect(Unit) {
@@ -468,5 +505,6 @@ fun AppNavigation() {
                 }
             }
         }
+    }
     }
 }

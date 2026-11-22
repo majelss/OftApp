@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.oftapp.data.SucursalClinica
+import com.example.oftapp.viewmodel.AdminSystemConfigViewModel
 
 private data class RetentionOption(
     val key: String,

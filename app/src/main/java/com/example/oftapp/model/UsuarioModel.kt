@@ -17,4 +17,14 @@ data class EstadoSesion(
 
 fun EstadoSesion.esPaciente(): Boolean = rol.equals(Roles.PACIENTE, ignoreCase = true)
 
-fun EstadoSesion.esAdmin(): Boolean = rol.equals(Roles.ADMINISTRADOR, ignoreCase = true)
+fun EstadoSesion.esAdmin(): Boolean =
+    rol.equals(Roles.ADMINISTRADOR, ignoreCase = true) ||
+        rol.equals(Roles.ADMINISTRATIVO, ignoreCase = true)
+
+fun EstadoSesion.esTecnico(): Boolean =
+    rol.equals(Roles.TECNICO, ignoreCase = true) ||
+        rol.equals("TECNOLOGO_MEDICO", ignoreCase = true)
+
+fun EstadoSesion.esMedico(): Boolean =
+    rol.equals(Roles.MEDICO, ignoreCase = true) ||
+        (!esPaciente() && !esAdmin() && !esTecnico())

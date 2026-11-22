@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.oftapp.viewmodel.AdminUserViewModel
 
 private data class RolOption(
     val key: String,
@@ -85,7 +86,7 @@ fun AdminUserFormScreen(
                     ) {
                         IconButton(
                             onClick = onNavigateBack,
-                            modifier = Modifier.size(48.dp)
+                            modifier = Modifier.size(44.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -93,14 +94,39 @@ fun AdminUserFormScreen(
                                 tint = ClinicalClarityColors.OnSurface
                             )
                         }
-                        Text(
-                            text = "Detalle De Usuario",
-                            fontSize = 19.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = ClinicalClarityColors.OnSurface,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(38.dp)
+                                .clip(RoundedCornerShape(11.dp))
+                                .background(ClinicalClarityColors.SurfaceHigh),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Visibility,
+                                contentDescription = null,
+                                tint = ClinicalClarityColors.Primary,
+                                modifier = Modifier.size(21.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column {
+                            Text(
+                                text = "OFTAPP ADMIN",
+                                fontSize = 10.5.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = ClinicalClarityColors.Primary,
+                                letterSpacing = 0.5.sp
+                            )
+                            Text(
+                                text = "Detalle De Usuario",
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = ClinicalClarityColors.OnSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -181,19 +207,30 @@ fun AdminUserFormScreen(
                         }
 
                         Spacer(modifier = Modifier.width(4.dp))
-                        Box(
-                            modifier = Modifier
-                                .size(34.dp)
-                                .clip(CircleShape)
-                                .background(ClinicalClarityColors.Primary),
-                            contentAlignment = Alignment.Center
+                        Surface(
+                            onClick = onNavigateBack,
+                            shape = RoundedCornerShape(50),
+                            color = ClinicalClarityColors.ErrorContainer,
+                            border = BorderStroke(1.dp, ClinicalClarityColors.Error.copy(alpha = 0.4f))
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Admin",
-                                tint = ClinicalClarityColors.OnPrimary,
-                                modifier = Modifier.size(18.dp)
-                            )
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.Logout,
+                                    contentDescription = "Cerrar Sesión",
+                                    tint = ClinicalClarityColors.Error,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Salir",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = ClinicalClarityColors.Error
+                                )
+                            }
                         }
                     }
                 }
@@ -456,39 +493,52 @@ fun AdminUserFormScreen(
                     )
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    // Cuadrícula visible con todos los 5 roles sin ocultar ninguno fuera de pantalla
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        roles.forEach { rol ->
-                            val isSelected = state.rolSeleccionado == rol.key
-                            Surface(
-                                onClick = { viewModel.onRolChange(rol.key) },
-                                shape = RoundedCornerShape(12.dp),
-                                color = if (isSelected) ClinicalClarityColors.Primary else ClinicalClarityColors.SurfaceLow,
-                                shadowElevation = if (isSelected) 2.dp else 0.dp
+                        roles.chunked(2).forEach { filaRoles ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Row(
-                                    modifier = Modifier
-                                        .height(48.dp)
-                                        .padding(horizontal = 16.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = rol.icon,
-                                        contentDescription = null,
-                                        tint = if (isSelected) ClinicalClarityColors.OnPrimary else ClinicalClarityColors.OnSurface,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = rol.label,
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = if (isSelected) ClinicalClarityColors.OnPrimary else ClinicalClarityColors.OnSurface
-                                    )
+                                filaRoles.forEach { rol ->
+                                    val isSelected = state.rolSeleccionado == rol.key
+                                    Surface(
+                                        onClick = { viewModel.onRolChange(rol.key) },
+                                        modifier = Modifier.weight(1f),
+                                        shape = RoundedCornerShape(12.dp),
+                                        color = if (isSelected) ClinicalClarityColors.Primary else ClinicalClarityColors.SurfaceLow,
+                                        border = BorderStroke(
+                                            1.dp,
+                                            if (isSelected) ClinicalClarityColors.Primary else ClinicalClarityColors.CardBorder
+                                        ),
+                                        shadowElevation = if (isSelected) 2.dp else 0.dp
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .height(48.dp)
+                                                .padding(horizontal = 12.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Icon(
+                                                imageVector = rol.icon,
+                                                contentDescription = null,
+                                                tint = if (isSelected) ClinicalClarityColors.OnPrimary else ClinicalClarityColors.OnSurface,
+                                                modifier = Modifier.size(19.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = rol.label,
+                                                fontSize = 13.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = if (isSelected) ClinicalClarityColors.OnPrimary else ClinicalClarityColors.OnSurface,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }

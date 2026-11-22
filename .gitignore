@@ -1,6 +1,7 @@
 *.iml
 .gradle
 /local.properties
+local.properties
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
@@ -12,4 +13,14 @@
 /captures
 .externalNativeBuild
 .cxx
-local.properties
+
+# Seguridad y Firma Digital (Anexo Técnico E: Nunca subir .jks ni secretos a GitHub)
+*.jks
+*.keystore
+keystore.properties
+*.p12
+
+# Compilaciones del Microservicio Backend Spring Boot
+backend/target/
+backend/build/
+backend/.gradle/

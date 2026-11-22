@@ -1,4 +1,4 @@
-package com.example.oftapp.ui.screens.admin
+package com.example.oftapp.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.oftapp.data.AdminRepository
 import com.example.oftapp.data.local.UsuarioAdminEntity
+import com.example.oftapp.ui.screens.admin.validarFormatoRutChileno
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -81,6 +82,9 @@ class AdminUserViewModel(
     )
 
     init {
+        viewModelScope.launch {
+            repository.sincronizarConBackend()
+        }
         viewModelScope.launch {
             repository.usuariosFlow.collect { lista ->
                 _uiState.update { it.copy(usuariosRegistrados = lista) }

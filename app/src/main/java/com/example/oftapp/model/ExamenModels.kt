@@ -48,7 +48,8 @@ data class ExamenOftalmologico(
     val observaciones: String,
     val estado: String = "Pendiente",
     val fecha: String,
-    val firmaElectronica: String = "Dr. C. Mendoza"
+    val firmaElectronica: String = "Dr. C. Mendoza",
+    val pendienteSincronizacion: Boolean = false
 )
 
 /**
