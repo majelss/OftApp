@@ -334,35 +334,17 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Selector Visible de Todos los Roles del Sistema
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Seleccione Rol Clínico (4 roles con vistas propias)",
-                            fontSize = 12.5.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.DarkGray
-                        )
-                        Surface(
-                            color = SoftBlueBadge,
-                            shape = RoundedCornerShape(50)
-                        ) {
-                            Text(
-                                text = selectedRol.titulo,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = PrimaryBlue,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp)
-                            )
-                        }
-                    }
+                    // Selector de Roles del Sistema
+                    Text(
+                        text = "Seleccionar Rol",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.DarkGray
+                    )
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Lista visible con los 4 roles para seleccionarlos con 1 toque
+                    // Lista de roles para selección rápida
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)

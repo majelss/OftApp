@@ -78,13 +78,12 @@ object ClinicalClarityColors {
 
 enum class AdminTab(val label: String, val icon: ImageVector) {
     USUARIOS("Usuarios", Icons.Default.Group),
-    CATALOGOS("Catálogos", Icons.Default.MenuBook),
     SISTEMA("Sistema", Icons.Default.Tune),
     AUDITORIA("Auditoría", Icons.Default.VerifiedUser)
 }
 
 /**
- * Barra de navegación inferior persistente exclusiva del módulo Administrador (4 destinos),
+ * Barra de navegación inferior persistente exclusiva del módulo Administrador (3 destinos),
  * unificada con el estilo Material 3 NavigationBar de toda la aplicación.
  */
 @Composable
@@ -143,7 +142,8 @@ fun AdminBottomNavBar(
 @Composable
 fun AdminModuleHeader(
     title: String,
-    onBackClick: () -> Unit,
+    onBackClick: () -> Unit = {},
+    onMenuClick: (() -> Unit)? = null,
     onSearchClick: (() -> Unit)? = null,
     onProfileClick: (() -> Unit)? = null
 ) {
@@ -165,15 +165,28 @@ fun AdminModuleHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f)
             ) {
-                IconButton(
-                    onClick = onBackClick,
-                    modifier = Modifier.size(44.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Volver al menú",
-                        tint = ClinicalClarityColors.OnSurface
-                    )
+                if (onMenuClick != null) {
+                    IconButton(
+                        onClick = onMenuClick,
+                        modifier = Modifier.size(44.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Abrir menú principal",
+                            tint = ClinicalClarityColors.OnSurface
+                        )
+                    }
+                } else {
+                    IconButton(
+                        onClick = onBackClick,
+                        modifier = Modifier.size(44.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver al menú",
+                            tint = ClinicalClarityColors.OnSurface
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.width(4.dp))
                 Box(

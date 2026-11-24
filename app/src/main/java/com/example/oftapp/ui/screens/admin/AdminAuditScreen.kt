@@ -16,6 +16,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,22 +66,44 @@ fun AdminAuditScreen(
         state.logsFiltrados.groupBy { it.fechaGrupo }
     }
 
-    Scaffold(
-        containerColor = ClinicalClarityColors.Surface,
-        topBar = {
-            AdminModuleHeader(
-                title = "Auditoría",
-                onBackClick = onNavigateBack,
-                onSearchClick = {}
-            )
-        },
-        bottomBar = {
-            AdminBottomNavBar(
-                selectedTab = AdminTab.AUDITORIA,
-                onSelectTab = onNavigateTab
-            )
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(
+                drawerContainerColor = Color.White,
+                drawerShape = RoundedCornerShape(topEnd = 0.dp, bottomEnd = 0.dp)
+            ) {
+                AdminDrawerMenu(
+                    selectedTab = AdminTab.AUDITORIA,
+                    onSelectTab = { tab ->
+                        scope.launch { drawerState.close() }
+                        onNavigateTab(tab)
+                    },
+                    onLogout = onNavigateBack
+                )
+            }
         }
-    ) { innerPadding ->
+    ) {
+        Scaffold(
+            containerColor = ClinicalClarityColors.Surface,
+            topBar = {
+                AdminModuleHeader(
+                    title = "Auditoría",
+                    onBackClick = onNavigateBack,
+                    onMenuClick = { scope.launch { drawerState.open() } },
+                    onSearchClick = {}
+                )
+            },
+            bottomBar = {
+                AdminBottomNavBar(
+                    selectedTab = AdminTab.AUDITORIA,
+                    onSelectTab = onNavigateTab
+                )
+            }
+        ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -540,6 +563,7 @@ fun AdminAuditScreen(
             }
         }
     }
+}
 }
 
 private fun compartirResumenAuditoria(

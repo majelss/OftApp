@@ -1,4 +1,4 @@
-﻿package com.example.oftapp.ui.screens.tm.inicio
+package com.example.oftapp.ui.screens.tm.inicio
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,7 +29,8 @@ fun TmInicioScreen(
     onNuevoExamen: () -> Unit = {},
     onVerMisRegistros: () -> Unit = {},
     onNavigateBack: () -> Unit = {},
-    onVerPerfil: () -> Unit = {}
+    onVerPerfil: () -> Unit = {},
+    onMenuClick: (() -> Unit)? = null
 ) {
     val bgSurface = Color(0xFFF8F9FF)
     val cardBg = Color(0xFFFFFFFF)
@@ -45,6 +46,7 @@ fun TmInicioScreen(
         OftAppUnifiedTopBar(
             title = "Portal Tecnólogo Médico",
             badgeSubtitle = "OFTAPP CLINICAL • TM",
+            onMenuClick = onMenuClick,
             onProfileClick = onVerPerfil,
             onLogoutClick = onNavigateBack
         )
