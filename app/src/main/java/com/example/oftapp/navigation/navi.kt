@@ -90,7 +90,7 @@ private fun resolverRuta(destino: String, estadoSesion: EstadoSesion): String {
         estadoSesion.esAdmin() -> {
             when {
                 "usuarios" in d -> Rutas.ADMIN_USUARIOS
-                "sistema" in d || "config" in d || "catalogo" in d -> Rutas.ADMIN_SISTEMA
+                "sistema" in d || "config" in d -> Rutas.ADMIN_SISTEMA
                 "audit" in d -> Rutas.ADMIN_AUDITORIA
                 else -> Rutas.ADMIN_USUARIOS
             }
@@ -102,10 +102,10 @@ private fun resolverRuta(destino: String, estadoSesion: EstadoSesion): String {
                 "detalle" in d -> Rutas.DETALLE_EXAMEN
                 "atencion" in d -> Rutas.LISTA_ATENCIONES
                 "registr" in d || "examen" in d -> Rutas.REGISTRAR_EXAMEN
-                "dashboard" in d -> Rutas.DASHBOARD
                 "patolog" in d -> Rutas.PATOLOGIAS
-                "inicio" in d || "menu" in d -> Rutas.MAIN_MENU
-                else -> Rutas.MAIN_MENU
+                "dashboard" in d || "inicio" in d -> Rutas.DASHBOARD
+                "menu" in d -> Rutas.MAIN_MENU
+                else -> Rutas.DASHBOARD
             }
         }
     }
@@ -146,7 +146,6 @@ fun AppNavigation() {
     val navegarTabAdmin: (AdminTab) -> Unit = { tab ->
         val ruta = when (tab) {
             AdminTab.USUARIOS -> Rutas.ADMIN_USUARIOS
-            AdminTab.CATALOGOS -> Rutas.ADMIN_SISTEMA
             AdminTab.SISTEMA -> Rutas.ADMIN_SISTEMA
             AdminTab.AUDITORIA -> Rutas.ADMIN_AUDITORIA
         }
@@ -174,7 +173,7 @@ fun AppNavigation() {
                         estadoSesion.esPaciente() -> Rutas.PACIENTE_HOME
                         estadoSesion.esTecnico() -> Rutas.TM_MAIN
                         estadoSesion.esAdmin() -> Rutas.ADMIN_USUARIOS
-                        else -> Rutas.MAIN_MENU
+                        else -> Rutas.DASHBOARD
                     }
 
                     navController.navigate(rutaInicio) {
@@ -193,6 +192,7 @@ fun AppNavigation() {
                     onVerExamenesArchivados = {
                         navController.navigate(Rutas.PACIENTE_EXAMENES)
                     },
+                    onCerrarSesion = cerrarSesionGlobal,
                     onNavegarItemBottomBar = { destino ->
                         when (destino) {
                             "inicio" -> navController.navigate(Rutas.PACIENTE_HOME)

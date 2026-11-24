@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,22 +53,44 @@ fun AdminSystemConfigScreen(
         )
     }
 
-    Scaffold(
-        containerColor = ClinicalClarityColors.Surface,
-        topBar = {
-            AdminModuleHeader(
-                title = "Sistema",
-                onBackClick = onNavigateBack,
-                onSearchClick = {}
-            )
-        },
-        bottomBar = {
-            AdminBottomNavBar(
-                selectedTab = AdminTab.SISTEMA,
-                onSelectTab = onNavigateTab
-            )
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(
+                drawerContainerColor = Color.White,
+                drawerShape = RoundedCornerShape(topEnd = 0.dp, bottomEnd = 0.dp)
+            ) {
+                AdminDrawerMenu(
+                    selectedTab = AdminTab.SISTEMA,
+                    onSelectTab = { tab ->
+                        scope.launch { drawerState.close() }
+                        onNavigateTab(tab)
+                    },
+                    onLogout = onNavigateBack
+                )
+            }
         }
-    ) { innerPadding ->
+    ) {
+        Scaffold(
+            containerColor = ClinicalClarityColors.Surface,
+            topBar = {
+                AdminModuleHeader(
+                    title = "Sistema",
+                    onBackClick = onNavigateBack,
+                    onMenuClick = { scope.launch { drawerState.open() } },
+                    onSearchClick = {}
+                )
+            },
+            bottomBar = {
+                AdminBottomNavBar(
+                    selectedTab = AdminTab.SISTEMA,
+                    onSelectTab = onNavigateTab
+                )
+            }
+        ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -744,6 +767,7 @@ fun AdminSystemConfigScreen(
             }
         )
     }
+}
 }
 
 private fun boxesActivosSafeText(input: String): String = input

@@ -1,13 +1,16 @@
-﻿package com.example.oftapp.ui.screens.tm
+package com.example.oftapp.ui.screens.tm
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -35,6 +38,8 @@ fun TmMainScaffold(
     val tmNavController = rememberNavController()
     val navBackStackEntry by tmNavController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
     val navItemColors = NavigationBarItemDefaults.colors(
         selectedIconColor = UnifiedPrimaryBlue,
@@ -44,8 +49,38 @@ fun TmMainScaffold(
         unselectedTextColor = UnifiedMutedSlate
     )
 
-    Scaffold(
-        bottomBar = {
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(
+                drawerContainerColor = Color.White,
+                drawerShape = RoundedCornerShape(topEnd = 0.dp, bottomEnd = 0.dp)
+            ) {
+                TmDrawerMenu(
+                    opcionSeleccionada = when (currentRoute) {
+                        TmRutas.INICIO -> TmRutas.INICIO
+                        TmRutas.REGISTRAR -> TmRutas.REGISTRAR
+                        TmRutas.REGISTROS -> TmRutas.REGISTROS
+                        TmRutas.PERFIL -> TmRutas.PERFIL
+                        else -> TmRutas.INICIO
+                    },
+                    onSeleccionar = { destino ->
+                        scope.launch { drawerState.close() }
+                        if (destino == "login") {
+                            onLogoutToLogin()
+                        } else {
+                            tmNavController.navigate(destino) {
+                                popUpTo(TmRutas.INICIO)
+                                launchSingleTop = true
+                            }
+                        }
+                    }
+                )
+            }
+        }
+    ) {
+        Scaffold(
+            bottomBar = {
             Surface(
                 color = Color.White,
                 shadowElevation = 8.dp,
@@ -115,6 +150,7 @@ fun TmMainScaffold(
             composable(TmRutas.INICIO) {
                 TmInicioScreen(
                     onNavigateBack = onLogoutToLogin,
+                    onMenuClick = { scope.launch { drawerState.open() } },
                     onNuevoExamen = { tmNavController.navigate(TmRutas.REGISTRAR) },
                     onVerMisRegistros = { tmNavController.navigate(TmRutas.REGISTROS) },
                     onVerPerfil = { tmNavController.navigate(TmRutas.PERFIL) }
@@ -154,4 +190,5 @@ fun TmMainScaffold(
             }
         }
     }
+}
 }

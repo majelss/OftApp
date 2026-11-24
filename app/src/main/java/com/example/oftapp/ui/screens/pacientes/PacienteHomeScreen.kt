@@ -13,6 +13,8 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,16 +44,43 @@ fun PacienteHomeScreen(
     onGenerarQR: () -> Unit = {},
     onDescargarPDF: () -> Unit = {},
     onCompartirExamen: () -> Unit = {},
+    onCerrarSesion: () -> Unit = {},
     onNavegarItemBottomBar: (String) -> Unit = {}
 ) {
-    Scaffold(
-        topBar = {
-            OftAppUnifiedTopBar(
-                title = "Inicio",
-                badgeSubtitle = "OFTAPP CLÍNICA",
-                onProfileClick = { onNavegarItemBottomBar("perfil") }
-            )
-        },
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val coroutineScope = rememberCoroutineScope()
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(
+                drawerContainerColor = Color.White,
+                drawerShape = RoundedCornerShape(topEnd = 0.dp, bottomEnd = 0.dp)
+            ) {
+                PacienteDrawerMenu(
+                    opcionSeleccionada = "inicio",
+                    onSeleccionar = { destino ->
+                        coroutineScope.launch { drawerState.close() }
+                        if (destino == "login") {
+                            onCerrarSesion()
+                        } else {
+                            onNavegarItemBottomBar(destino)
+                        }
+                    }
+                )
+            }
+        }
+    ) {
+        Scaffold(
+            topBar = {
+                OftAppUnifiedTopBar(
+                    title = "Inicio",
+                    badgeSubtitle = "OFTAPP PACIENTE",
+                    onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                    onProfileClick = { onNavegarItemBottomBar("perfil") },
+                    onLogoutClick = onCerrarSesion
+                )
+            },
         bottomBar = {
             OftAppPacienteBottomBar(
                 selectedTab = "inicio",
@@ -497,4 +526,5 @@ fun PacienteHomeScreen(
             }
         }
     }
+}
 }

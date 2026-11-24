@@ -16,6 +16,7 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -63,37 +64,58 @@ fun AdminUserFormScreen(
         )
     }
 
-    Scaffold(
-        containerColor = ClinicalClarityColors.Surface,
-        topBar = {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = ClinicalClarityColors.SurfaceLowest,
-                shadowElevation = 2.dp
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(
+                drawerContainerColor = Color.White,
+                drawerShape = RoundedCornerShape(topEnd = 0.dp, bottomEnd = 0.dp)
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .statusBarsPadding()
-                        .height(64.dp)
-                        .padding(horizontal = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                AdminDrawerMenu(
+                    selectedTab = AdminTab.USUARIOS,
+                    onSelectTab = { tab ->
+                        scope.launch { drawerState.close() }
+                        onNavigateTab(tab)
+                    },
+                    onLogout = onNavigateBack
+                )
+            }
+        }
+    ) {
+        Scaffold(
+            containerColor = ClinicalClarityColors.Surface,
+            topBar = {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = ClinicalClarityColors.SurfaceLowest,
+                    shadowElevation = 2.dp
                 ) {
                     Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .statusBarsPadding()
+                            .height(64.dp)
+                            .padding(horizontal = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        IconButton(
-                            onClick = onNavigateBack,
-                            modifier = Modifier.size(44.dp)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
                         ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Volver",
-                                tint = ClinicalClarityColors.OnSurface
-                            )
-                        }
+                            IconButton(
+                                onClick = { scope.launch { drawerState.open() } },
+                                modifier = Modifier.size(44.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Menu,
+                                    contentDescription = "Abrir menú de navegación",
+                                    tint = ClinicalClarityColors.OnSurface
+                                )
+                            }
                         Spacer(modifier = Modifier.width(4.dp))
                         Box(
                             modifier = Modifier
@@ -1371,6 +1393,7 @@ fun AdminUserFormScreen(
             )
         }
     }
+}
 }
 
 @Composable
